@@ -1,0 +1,13 @@
+{
+  "name": "pro-app-license-portal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private licensing portal with authenticated Ed25519 license issuance",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
