@@ -1,0 +1,26 @@
+name: "Keystone Licensing Portal"
+description: "Private multi-application licensing portal"
+version: "0.1.0"
+slug: "keystone"
+url: "https://github.com/cjramseyer/pro-app-license-portal"
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: services
+ingress: true
+ingress_port: 3000
+panel_icon: "mdi:key-chain"
+panel_title: "Keystone"
+ports:
+  3000/tcp: null
+ports_description:
+  3000/tcp: "Optional direct access to the Keystone portal"
+map:
+  - type: data
+    path: /data
+    read_only: false
+options:
+  portal_admin_password: ""
+schema:
+  portal_admin_password: password

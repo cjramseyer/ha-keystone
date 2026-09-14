@@ -7,15 +7,16 @@ Keystone is a static prototype of the private licensing operations portal descri
 Run the authenticated portal server with Node 18 or newer:
 
 ```powershell
+cd keystone
 $env:PORTAL_ADMIN_PASSWORD = "replace-this-password"
 npm start
 ```
 
 Open `http://localhost:3000`. For a first-run local demo, the fallback administrator password is `change-me-local`; set `PORTAL_ADMIN_PASSWORD` before first launch for a real local password. The administrator username is `admin`.
 
-Opening `index.html` directly also loads the navigation in read-only demo mode, but license issuance and authentication require the server URL above.
+Opening `keystone/index.html` directly also loads the navigation in read-only demo mode, but license issuance and authentication require the server URL above.
 
-`npm run check` validates both JavaScript entry points.
+Run `npm run check` from the `keystone/` directory to validate both JavaScript entry points.
 
 The prototype includes:
 
@@ -40,6 +41,8 @@ The prototype includes:
 - Persisted application profiles remain authoritative across server restarts; deleted demo profiles are not recreated
 
 The server stores only a SHA-256 token hash in its persisted license metadata. The raw signed token is returned once from the issuance response so it can be delivered to the customer. The activation request must be JSON containing `app_id`, `installation_id`, `instance_key_id`, `nonce`, `instance_public_key`, and a base64url `signature` over `app_id.installation_id.instance_key_id.nonce`.
+
+The Home Assistant add-on package is in [`keystone/`](keystone/). It binds the portal to Home Assistant ingress and persists local state under `/data`.
 
 For production, replace the local JSON store with a database, move issuer keys to a secret manager or KMS, configure MFA and rate limiting, and rotate the initial local credentials. Delete `.data/auth.json` before restarting if the first-run password needs to be initialized again.
 

@@ -28,14 +28,16 @@ For a disposable demo, the fallback password is `change-me-local`. Do not use th
 ## Start the portal
 
 ```powershell
+cd keystone
 npm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Run source checks with:
+Run source checks from the `keystone/` directory:
 
 ```powershell
+cd keystone
 npm run check
 ```
 
@@ -43,14 +45,14 @@ npm run check
 
 The first server start creates:
 
-- `.data/portal.json`: customers, profiles, licenses, and audit events.
-- `.data/auth.json`: the administrator username, display name, email, and password hash.
-- `.data/session-secret`: reserved local session material.
-- `.secrets/issuer-private.pem`: local Ed25519 private signing key.
-- `.secrets/issuer-public.pem`: local Ed25519 public key.
+- `keystone/.data/portal.json`: customers, profiles, licenses, and audit events.
+- `keystone/.data/auth.json`: the administrator username, display name, email, and password hash.
+- `keystone/.data/session-secret`: reserved local session material.
+- `keystone/.secrets/issuer-private.pem`: local Ed25519 private signing key.
+- `keystone/.secrets/issuer-public.pem`: local Ed25519 public key.
 
 `.data/` and `.secrets/` are excluded by `.gitignore`. Keep them out of source control.
 
 ## Direct HTML mode
 
-Opening `index.html` directly uses read-only demo mode. Authentication, persistence, license issuance, and API calls require the Node server at `http://localhost:3000`.
+Opening `keystone/index.html` directly uses read-only demo mode. Authentication, persistence, license issuance, and API calls require the Node server at `http://localhost:3000`.

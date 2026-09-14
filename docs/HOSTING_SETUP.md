@@ -146,6 +146,7 @@ git --version
 ```powershell
 git clone https://github.com/cjramseyer/pro-app-license-portal C:\devel\Personal-GitHub\pro-app-license-portal
 cd C:\devel\Personal-GitHub\pro-app-license-portal
+cd keystone
 npm install
 ```
 
@@ -174,14 +175,15 @@ http://localhost:3000
 Run the source checks in another terminal:
 
 ```powershell
+cd keystone
 npm run check
 ```
 
-The prototype stores local state in `.data/` and generates issuer keys in `.secrets/`. Both directories must stay out of Git. Back them up securely if the local prototype is used for a private test environment.
+The prototype stores local state in `keystone/.data/` and generates issuer keys in `keystone/.secrets/`. Both directories must stay out of Git. Back them up securely if the local prototype is used for a private test environment.
 
 ## Phase 2: Prepare the Production Application
 
-The current `server.js` and `app.js` are not yet Cloudflare Worker entry points. Before deployment, split the application into runtime-neutral modules.
+The current `keystone/server.js` and `keystone/app.js` are not yet Cloudflare Worker entry points. Before deployment, split the application into runtime-neutral modules.
 
 ### 1. Separate the portal layers
 

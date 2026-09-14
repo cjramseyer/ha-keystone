@@ -9,7 +9,7 @@ Browser
   |
   | HTTP + JSON + HttpOnly session cookie
   v
-server.js
+keystone/server.js
   |-- auth and session handling
   |-- application profile rules
   |-- customer and license workflows
@@ -17,10 +17,10 @@ server.js
   |-- Ed25519 signing and verification
   |-- audit event writes
   |
-  |-- .data/portal.json
-  |-- .data/auth.json
-  |-- .secrets/issuer-private.pem
-  |-- .secrets/issuer-public.pem
+  |-- keystone/.data/portal.json
+  |-- keystone/.data/auth.json
+  |-- keystone/.secrets/issuer-private.pem
+  |-- keystone/.secrets/issuer-public.pem
 ```
 
 ## Domain model

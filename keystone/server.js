@@ -4,14 +4,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const rootDirectory = __dirname;
-const dataDirectory = path.join(rootDirectory, '.data');
-const secretsDirectory = path.join(rootDirectory, '.secrets');
+const dataDirectory = process.env.DATA_DIR || path.join(rootDirectory, '.data');
+const secretsDirectory = process.env.SECRETS_DIR || path.join(dataDirectory, '.secrets');
 const dataFile = path.join(dataDirectory, 'portal.json');
 const authFile = path.join(dataDirectory, 'auth.json');
 const sessionSecretFile = path.join(dataDirectory, 'session-secret');
 const privateKeyFile = path.join(secretsDirectory, 'issuer-private.pem');
 const publicKeyFile = path.join(secretsDirectory, 'issuer-public.pem');
 const port = Number(process.env.PORT || 3000);
+const host = process.env.HOST || '127.0.0.1';
 const sessionCookie = 'keystone_session';
 const sessionDurationMs = 8 * 60 * 60 * 1000;
 const sessions = new Map();
@@ -395,4 +396,4 @@ const server = http.createServer(async (request, response) => {
     else sendError(response, 405, 'Method not allowed');
   } catch (error) { console.error(error); if (!response.headersSent) sendError(response, 500, 'Unexpected server error'); }
 });
-server.listen(port, () => console.log(`Keystone portal running at http://localhost:${port}`));
+server.listen(port, host, () => console.log(`Keystone portal running at http://${host}:${port}`));
