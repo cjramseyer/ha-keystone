@@ -27,12 +27,15 @@ body:
       options:
         - Add-on startup / shutdown
         - Web dashboard
-        - Bar stock management
-        - Keg management
-        - Tap management
-        - Data export (JSON/CSV)
+        - Authentication / administrator profile
+        - Application profiles / license options
+        - Customers / license issuance
+        - License renewal / revocation
+        - Signing / activation verification
+        - Persistence / data recovery
+        - Home Assistant ingress / add-on startup
         - REST API
-        - Display view
+        - Dashboard UI
         - Other
     validations:
       required: true
@@ -41,7 +44,7 @@ body:
     id: logs
     attributes:
       label: Add-on logs
-      description: Paste the full relevant log output here (Settings → Add-ons → BarTender → Log tab).
+      description: Paste the full relevant log output here (Settings → Add-ons → Keystone → Log tab).
       render: text
     validations:
       required: true
@@ -49,7 +52,7 @@ body:
   - type: input
     id: addon_version
     attributes:
-      label: Add-on version
+      label: Keystone add-on version
       placeholder: e.g. 1.2.0
     validations:
       required: true

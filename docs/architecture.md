@@ -67,4 +67,4 @@ The repository's [HOSTING_SETUP.md](../HOSTING_SETUP.md) describes the intended 
 - Persistence
 - Audit logging
 
-The GitHub issue [#1 Add multi-workspace support](https://github.com/cjramseyer/pro-app-license-portal/issues/1) tracks workspace isolation, membership, switching, and data migration.
+The GitHub issue [#1 Add multi-workspace support](https://github.com/cjramseyer/ha-keystone/issues/1) tracks workspace isolation, membership, switching, and data migration.

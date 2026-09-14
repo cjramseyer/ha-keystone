@@ -32,14 +32,16 @@ body:
     attributes:
       label: Area
       options:
-        - Bar stock management
-        - Keg tracking
-        - Tap management
-        - Web dashboard UI
+        - Authentication / administrator profile
+        - Application profiles / license options
+        - Customers / license issuance
+        - License renewal / revocation
+        - Signing / activation verification
+        - Multi-workspace support
+        - Home Assistant add-on / ingress
+        - Dashboard UI
         - REST API
-        - Data export
-        - Configuration options
-        - Display view
+        - Persistence / data export
         - Performance
         - Other
     validations:

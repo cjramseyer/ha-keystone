@@ -144,8 +144,8 @@ git --version
 ### 2. Clone the portal
 
 ```powershell
-git clone https://github.com/cjramseyer/pro-app-license-portal C:\devel\Personal-GitHub\pro-app-license-portal
-cd C:\devel\Personal-GitHub\pro-app-license-portal
+git clone https://github.com/cjramseyer/ha-keystone C:\devel\Personal-GitHub\ha-keystone
+cd C:\devel\Personal-GitHub\ha-keystone
 cd keystone
 npm install
 ```

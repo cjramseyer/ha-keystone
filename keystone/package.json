@@ -1,5 +1,5 @@
 {
-  "name": "pro-app-license-portal",
+  "name": "ha-keystone",
   "version": "0.1.0",
   "private": true,
   "description": "Private licensing portal with authenticated Ed25519 license issuance",

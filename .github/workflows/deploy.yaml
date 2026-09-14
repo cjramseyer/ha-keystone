@@ -41,12 +41,12 @@ jobs:
         run: |
           for arch in amd64 aarch64; do
             docker buildx imagetools create \
-              --tag "ghcr.io/${{ github.repository_owner }}/bartender/${arch}:dev" \
-              "ghcr.io/${{ github.repository_owner }}/bartender/${arch}:edge"
+              --tag "ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}:dev" \
+              "ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}:edge"
           done
 
       - name: Tag multi-arch image as dev
         run: |
           docker buildx imagetools create \
-            --tag "ghcr.io/${{ github.repository_owner }}/bartender:dev" \
-            "ghcr.io/${{ github.repository_owner }}/bartender:edge"
+            --tag "ghcr.io/${{ github.repository_owner }}/ha-keystone:dev" \
+            "ghcr.io/${{ github.repository_owner }}/ha-keystone:edge"

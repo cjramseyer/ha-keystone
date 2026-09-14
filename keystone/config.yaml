@@ -1,8 +1,8 @@
 name: "Keystone Licensing Portal"
 description: "Private multi-application licensing portal"
-version: "0.1.0"
+version: "dev"
 slug: "keystone"
-url: "https://github.com/cjramseyer/pro-app-license-portal"
+url: "https://github.com/cjramseyer/ha-keystone"
 arch:
   - amd64
   - aarch64

@@ -11,14 +11,14 @@ with the project.
 
 You've found a bug in the source code, a mistake in the documentation or maybe
 you'd like a new feature? You can help us by submitting an issue to our
-[https://github.com/cjramseyer/pro-app-license-portal]. Before you create an issue, make sure you search
+[https://github.com/cjramseyer/ha-keystone]. Before you create an issue, make sure you search
 the archive, maybe your question was already answered.
 
 Even better: You could submit a pull request with a fix / new feature!
 
 ## Pull request process
 
-1. Search our repository for open or closed [https://github.com/cjramseyer/pro-app-license-portal/pulls] that relate
+1. Search our repository for open or closed [https://github.com/cjramseyer/ha-keystone/pulls] that relate
    to your submission to avoid duplicate effort.
 
 1. Open pull requests are reviewed by the developer (@cjramseyer) and
@@ -31,5 +31,5 @@ Even better: You could submit a pull request with a fix / new feature!
 
 1. Once reviewed and approved, the developer will merge the pull request.
 
-[github]: https://github.com/cjramseyer/pro-app-license-portal/issues
-[prs]: https://github.com/cjramseyer/pro-app-license-portal/pulls
+[github]: https://github.com/cjramseyer/ha-keystone/issues
+[prs]: https://github.com/cjramseyer/ha-keystone/pulls

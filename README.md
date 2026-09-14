@@ -1,4 +1,4 @@
-# pro-app-license-portal
+# ha-keystone
 
 Keystone is a static prototype of the private licensing operations portal described in `LICENSE_PORTAL_IMPLEMENTATION.md`.
 
