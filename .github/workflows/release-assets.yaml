@@ -11,28 +11,17 @@ permissions:
   contents: write
 
 jobs:
-  sample-export-assets:
-    name: Upload sample export assets
+  keystone-sample-assets:
+    name: Upload Keystone sample data
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install add-on dependencies
-        run: pip install -r bartender/requirements.txt
-
-      - name: Build sample export assets
-        run: python bartender/scripts/build_sample_release_assets.py --output-dir release-assets
 
       - name: Upload assets to release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            release-assets/ha-keystone_sample_data.json \
+            keystone/samples/keystone_sample_data.json \
             --clobber
