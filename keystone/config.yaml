@@ -2,7 +2,7 @@
 name: "Keystone Licensing Portal"
 description: "Private multi-application licensing portal"
 version: "dev"
-slug: "keystone"
+slug: "ha-keystone"
 url: "https://github.com/cjramseyer/ha-keystone"
 arch:
   - amd64
