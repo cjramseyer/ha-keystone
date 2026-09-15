@@ -22,6 +22,10 @@ The add-on listens on internal port `3000`, binds to `0.0.0.0`, and enables ingr
 
 The default password is `change-me-local` only when the add-on starts without a configured password and has no existing `/data/auth.json`. Set a real password before the first start.
 
+If a previous installation left an old `/data/auth.json` behind, update the add-on configuration with the desired `portal_admin_password`, save, and restart the add-on. The server now replaces the stored password hash whenever a configured value is present and differs from the current one.
+
+If you intentionally need to reset the admin login, stop the add-on, delete `/data/auth.json`, set the new `portal_admin_password`, and start it again. This recreates the admin record with the new password.
+
 ## Persistent storage
 
 Home Assistant maps the add-on data directory to `/data`. Keystone stores:
