@@ -150,11 +150,7 @@ A signed JWS/JWT or signed JSON document is acceptable. The payload should conta
   "instance_id": "optional-instance-id",
   "plan": "pro",
   "license_type": "paid",
-  "features": [
-    "pos_sync",
-    "advanced_analytics",
-    "multiple_displays"
-  ],
+  "features": ["pos_sync", "advanced_analytics", "multiple_displays"],
   "issued_at": "2026-09-13T00:00:00Z",
   "expires_at": "2027-09-13T00:00:00Z",
   "installation_limit": 2,

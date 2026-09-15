@@ -16,8 +16,8 @@ The add-on listens on internal port `3000`, binds to `0.0.0.0`, and enables ingr
 
 ## Configuration
 
-| Option | Required | Description |
-| --- | --- | --- |
+| Option                  | Required    | Description                                     |
+| ----------------------- | ----------- | ----------------------------------------------- |
 | `portal_admin_password` | Recommended | Password for the `admin` administrator account. |
 
 The default password is `change-me-local` only when the add-on starts without a configured password and has no existing `/data/auth.json`. Set a real password before the first start.
