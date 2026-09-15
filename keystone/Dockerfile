@@ -1,7 +1,11 @@
 ARG BUILD_FROM
+# The Home Assistant builder supplies the architecture-specific base image.
+# hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
 # Node is installed in the add-on image; application state is mounted at /data.
+# Package versions are managed by the Home Assistant base image.
+# hadolint ignore=DL3018
 RUN apk add --no-cache nodejs npm
 
 WORKDIR /app
