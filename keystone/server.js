@@ -113,7 +113,11 @@ function ensureRuntimeFiles() {
   } else {
     const auth = JSON.parse(fs.readFileSync(authFile, "utf8"));
     let changed = false;
-    if (configuredPassword && (!auth.password_hash || !verifyPassword(configuredPassword, auth.password_hash))) {
+    if (
+      configuredPassword &&
+      (!auth.password_hash ||
+        !verifyPassword(configuredPassword, auth.password_hash))
+    ) {
       auth.password_hash = hashPassword(configuredPassword);
       changed = true;
       console.log("Admin password updated from PORTAL_ADMIN_PASSWORD.");
