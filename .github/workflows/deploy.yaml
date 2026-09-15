@@ -35,14 +35,16 @@ jobs:
     steps:
       - name: Log in to GHCR
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" |
+            docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Tag arch images as dev
         run: |
           for arch in amd64 aarch64; do
+            image="ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}"
             docker buildx imagetools create \
-              --tag "ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}:dev" \
-              "ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}:edge"
+              --tag "${image}:dev" \
+              "${image}:edge"
           done
 
       - name: Tag multi-arch image as dev

@@ -9,7 +9,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug. Please fill out the sections below as completely as possible.
+        Thanks for taking the time to report a bug. Please fill out the
+        sections below as completely as possible.
 
   - type: textarea
     id: description
@@ -44,7 +45,9 @@ body:
     id: logs
     attributes:
       label: Add-on logs
-      description: Paste the relevant add-on log output here (Settings → Add-ons → Keystone → Log tab).
+      description: >-
+        Paste the relevant add-on log output here (Settings → Add-ons → Keystone
+        → Log tab).
       render: text
 
   - type: input
@@ -78,4 +81,5 @@ body:
     id: additional
     attributes:
       label: Additional context
-      description: Any other context, screenshots, or configuration snippets that may help.
+      description: >-
+        Any other context, screenshots, or configuration snippets that may help.

@@ -1,6 +1,7 @@
 ---
 name: Problem / Error
-description: Report an error, crash, or unexpected behavior that isn't a clear code bug.
+description: >-
+  Report an error, crash, or unexpected behavior that isn't a clear code bug.
 title: "[Problem] "
 labels: ["priority-medium"]
 assignees:
@@ -44,7 +45,9 @@ body:
     id: logs
     attributes:
       label: Add-on logs
-      description: Paste the full relevant log output here (Settings → Add-ons → Keystone → Log tab).
+      description: >-
+        Paste the full relevant log output here (Settings → Add-ons → Keystone →
+        Log tab).
       render: text
     validations:
       required: true

@@ -15,7 +15,8 @@ body:
     id: problem
     attributes:
       label: Problem or motivation
-      description: What problem does this feature solve, or what use case does it enable?
+      description: >-
+        What problem does this feature solve, or what use case does it enable?
       placeholder: I'm trying to … but there's no way to …
     validations:
       required: true

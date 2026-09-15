@@ -9,7 +9,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this template to propose improvements to something that already works but could be better.
+        Use this template to propose improvements to something that already
+        works but could be better.
 
   - type: textarea
     id: current
