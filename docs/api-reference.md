@@ -146,11 +146,19 @@ Important request fields:
   "instance_value": "Example Home",
   "activation_request": {
     "app_id": "another-app",
-    "installation_id": "install_123",
+    "instance_id": "install_123",
     "instance_key_id": "key_123",
     "nonce": "nonce_123",
-    "instance_public_key": "base64url-spki-public-key",
-    "signature": "base64url-signature"
+    "instance_public_key": {
+      "algorithm": "Ed25519",
+      "encoding": "base64url",
+      "value": "base64url-public-key"
+    },
+    "signature": {
+      "algorithm": "Ed25519",
+      "encoding": "base64url",
+      "value": "base64url-signature"
+    }
   }
 }
 ```
@@ -158,12 +166,18 @@ Important request fields:
 The activation signature covers:
 
 ```text
-app_id.installation_id.instance_key_id.nonce
+app_id.instance_id.instance_key_id.nonce
 ```
+
+`instance_public_key.value` may be either a raw 32-byte Ed25519 public key or a base64url-encoded SPKI public key. The structured `algorithm`, `encoding`, and `value` format is accepted by the portal.
 
 ### `POST /api/licenses/:license_id/renew`
 
 Extends expiration by the license option duration and records a renewal audit event.
+
+### `POST /api/licenses/:license_id/reissue`
+
+Re-signs an active, unexpired license using its persisted claim snapshot and returns a new raw token for delivery. The license keeps the same ID, customer, expiration, features, and activation binding. The normalized activation request is also retained for support and audit purposes. The raw token is not persisted; only its replacement hash is stored.
 
 ### `POST /api/licenses/:license_id/revoke`
 

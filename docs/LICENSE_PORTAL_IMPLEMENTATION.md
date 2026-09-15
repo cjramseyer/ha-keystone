@@ -147,7 +147,7 @@ A signed JWS/JWT or signed JSON document is acceptable. The payload should conta
     "instance_key_id": "instance-key-abc123",
     "instance_public_key_sha256": "base64url-hash"
   },
-  "installation_id": "optional-installation-id",
+  "instance_id": "optional-instance-id",
   "plan": "pro",
   "license_type": "paid",
   "features": [
@@ -196,7 +196,7 @@ Example activation claims:
 {
   "license_id": "lic_12345",
   "app_id": "bartender",
-  "installation_id": "instance_abc",
+  "instance_id": "instance_abc",
   "instance_key_id": "instance-key-abc123",
   "instance_public_key_sha256": "base64url-hash",
   "activation_id": "activation_789",
@@ -354,7 +354,7 @@ The portal should not store raw license tokens when a token hash and license met
 - `id`
 - `license_id`
 - `app_profile_id`
-- `installation_id`
+- `instance_id`
 - `instance_key_id`
 - `instance_public_key`
 - `instance_value_hash`

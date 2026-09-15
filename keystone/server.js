@@ -125,15 +125,27 @@ function readBody(request) {
   });
 }
 function publicKeyFromInput(value) {
-  if (typeof value !== 'string' || !value.trim()) throw new Error('Activation request is missing its public key');
-  return value.includes('BEGIN PUBLIC KEY') ? crypto.createPublicKey(value) : crypto.createPublicKey({ key: Buffer.from(value, 'base64url'), type: 'spki', format: 'der' });
+  const encoded = typeof value === 'object' && value !== null ? value.value : value;
+  if (typeof encoded !== 'string' || !encoded.trim()) throw new Error('Activation request is missing its public key');
+  if (typeof value === 'object' && value.algorithm && value.algorithm !== 'Ed25519') throw new Error('Activation public key algorithm must be Ed25519');
+  if (typeof value === 'object' && value.encoding && value.encoding !== 'base64url') throw new Error('Activation public key encoding must be base64url');
+  if (encoded.includes('BEGIN PUBLIC KEY')) return crypto.createPublicKey(encoded);
+  const keyBytes = Buffer.from(encoded, 'base64url');
+  if (keyBytes.length === 32) {
+    const spkiPrefix = Buffer.from('302a300506032b6570032100', 'hex');
+    return crypto.createPublicKey({ key: Buffer.concat([spkiPrefix, keyBytes]), type: 'spki', format: 'der' });
+  }
+  return crypto.createPublicKey({ key: keyBytes, type: 'spki', format: 'der' });
 }
-function activationMessage(request) { return `${request.app_id}.${request.installation_id}.${request.instance_key_id}.${request.nonce}`; }
+function activationMessage(request) { return `${request.app_id}.${request.instance_id}.${request.instance_key_id}.${request.nonce}`; }
 function verifyActivationRequest(request) {
-  const required = ['app_id', 'installation_id', 'instance_key_id', 'nonce', 'signature', 'instance_public_key'];
-  if (required.some((field) => typeof request[field] !== 'string' || !request[field].trim())) throw new Error('Activation request is missing required instance proof fields');
+  const required = ['app_id', 'instance_id', 'instance_key_id', 'nonce', 'signature', 'instance_public_key'];
+  if (required.some((field) => request[field] === undefined || request[field] === null || (typeof request[field] === 'string' && !request[field].trim()))) throw new Error('Activation request is missing required instance proof fields');
   const publicKey = publicKeyFromInput(request.instance_public_key);
-  const valid = crypto.verify(null, Buffer.from(activationMessage(request)), publicKey, Buffer.from(request.signature, 'base64url'));
+  const signatureValue = typeof request.signature === 'object' && request.signature !== null ? request.signature.value : request.signature;
+  if (typeof signatureValue !== 'string' || !signatureValue.trim()) throw new Error('Activation request is missing its signature');
+  if (typeof request.signature === 'object' && request.signature.algorithm && request.signature.algorithm !== 'Ed25519') throw new Error('Activation signature algorithm must be Ed25519');
+  const valid = crypto.verify(null, Buffer.from(activationMessage(request)), publicKey, Buffer.from(signatureValue, 'base64url'));
   if (!valid) throw new Error('Instance proof signature is invalid');
   return crypto.createHash('sha256').update(publicKey.export({ type: 'spki', format: 'der' })).digest('base64url');
 }
@@ -156,7 +168,9 @@ function verifyLicenseToken(token) {
   return payload;
 }
 function id(prefix) { return `${prefix}_${crypto.randomBytes(8).toString('hex')}`; }
-function safeLicense(license) { const { token, ...metadata } = license; return metadata; }
+function safeLicense(license) { const { token, license_payload, activation_request, ...metadata } = license; return metadata; }
+function legacyLicensePayload(license) { return { version: license.version, license_id: license.license_id, app_id: license.app_id, profile_id: license.profile_id, customer_id: license.customer_id, aud: license.aud, instance_binding: license.instance_binding, option_id: license.option_id, option_type: license.option_type, option_length_days: license.option_length_days, plan: license.plan, license_type: license.license_type, features: license.features, issued_at: license.issued_at, expires_at: license.expires_at, installation_limit: license.installation_limit, key_id: license.key_id }; }
+function storedLicensePayload(license) { return license.license_payload ? JSON.parse(JSON.stringify(license.license_payload)) : legacyLicensePayload(license); }
 function calculateMetrics(data) {
   const now = Date.now();
   const validLicenses = data.licenses.filter((license) => license.status !== 'revoked' && Date.parse(license.expires_at) > now);
@@ -199,6 +213,9 @@ async function handleApi(request, response) {
     return sendJson(response, 200, { authenticated, profile: authenticated ? { username: auth.username, name: auth.name, email: auth.email } : null });
   }
   if (!isAuthenticated(request)) return sendError(response, 401, 'Administrator authentication required');
+  if (request.method === 'GET' && pathname === '/api/issuer/public-key') {
+    return sendJson(response, 200, { key_id: 'issuer-ed25519-01', algorithm: 'Ed25519', public_key_pem: fs.readFileSync(publicKeyFile, 'utf8') });
+  }
   if (request.method === 'PUT' && pathname === '/api/auth/profile') {
     const body = await readBody(request);
     const name = String(body.name || '').trim();
@@ -228,10 +245,26 @@ async function handleApi(request, response) {
     const currentExpiry = Math.max(Date.now(), Date.parse(license.expires_at));
     const renewedUntil = new Date(currentExpiry + extensionDays * 86400000).toISOString();
     license.expires_at = renewedUntil;
+    if (license.license_payload) license.license_payload.expires_at = renewedUntil;
     license.updated_at = new Date().toISOString();
     data.audit_events.push({ id: id('audit'), actor: 'admin', action: 'license.renewed', license_id: licenseId, customer_id: license.customer_id, metadata: { extension_days: extensionDays }, created_at: license.updated_at });
     writeData(data);
     return sendJson(response, 200, { license: safeLicense(license) });
+  }
+  const licenseReissueMatch = pathname.match(/^\/api\/licenses\/([^/]+)\/reissue$/);
+  if (request.method === 'POST' && licenseReissueMatch) {
+    const licenseId = decodeURIComponent(licenseReissueMatch[1]);
+    const data = readData();
+    const license = data.licenses.find((record) => record.license_id === licenseId);
+    if (!license) return sendError(response, 404, 'License not found');
+    if (license.status === 'revoked' || Date.parse(license.expires_at) <= Date.now()) return sendError(response, 409, 'Only active, unexpired licenses can be reissued');
+    const payload = storedLicensePayload(license);
+    const token = signLicense(payload);
+    license.token_hash = crypto.createHash('sha256').update(token).digest('hex');
+    license.updated_at = new Date().toISOString();
+    data.audit_events.push({ id: id('audit'), actor: 'admin', action: 'license.reissued', license_id: licenseId, customer_id: license.customer_id, created_at: license.updated_at });
+    writeData(data);
+    return sendJson(response, 200, { license: safeLicense(license), token });
   }
   const licenseRevokeMatch = pathname.match(/^\/api\/licenses\/([^/]+)\/revoke$/);
   if (request.method === 'POST' && licenseRevokeMatch) {
@@ -375,8 +408,9 @@ async function handleApi(request, response) {
     const customerId = existingCustomer?.id || id('cust');
     const payload = { version: 1, license_id: licenseId, app_id: profile.app_id, profile_id: profile.id, customer_id: customerId, aud: profile.token_audience, instance_binding: { instance_value: body.instance_value, instance_key_id: body.activation_request.instance_key_id, instance_public_key_sha256: instanceHash }, option_id: option.id, option_type: option.type, option_length_days: option.length_days, plan: option.type, license_type: option.type, features: option.type === 'pro' ? profile.features : [], issued_at: now.toISOString(), expires_at: expires.toISOString(), installation_limit: profile.installation_limit, key_id: 'issuer-ed25519-01' };
     const token = signLicense(payload);
+    const activationRequest = JSON.parse(JSON.stringify({ ...body.activation_request, app_id: profile.app_id }));
     if (!existingCustomer) data.customers.push({ id: customerId, name: customerName, email: customerEmail, created_at: now.toISOString() });
-    data.licenses.push({ ...payload, status: 'active', token_hash: crypto.createHash('sha256').update(token).digest('hex'), created_at: now.toISOString(), updated_at: now.toISOString() });
+    data.licenses.push({ ...payload, license_payload: JSON.parse(JSON.stringify(payload)), activation_request: activationRequest, status: 'active', token_hash: crypto.createHash('sha256').update(token).digest('hex'), created_at: now.toISOString(), updated_at: now.toISOString() });
     data.audit_events.push({ id: id('audit'), actor: 'admin', action: 'license.issued', license_id: licenseId, customer_id: customerId, created_at: now.toISOString() });
     writeData(data);
     return sendJson(response, 201, { license: safeLicense(payload), token });

@@ -56,7 +56,7 @@ A customer can be deleted only when no active license references it. Revoked-lic
 6. Paste the signed activation request exported by the application instance.
 7. Submit the form.
 
-The server verifies the instance proof before signing. The raw signed token is returned once by the issuance response. Persisted license metadata stores a SHA-256 token hash instead of the raw token.
+The server verifies the instance proof before signing. The raw signed token is returned once by the issuance response. The portal persists the normalized activation request and the exact signed license claims used to create the token. It stores a SHA-256 token hash instead of the raw token.
 
 ## Renew and revoke
 
@@ -66,6 +66,7 @@ From **Licenses**:
 - Revoked licenses remain visible as historical records.
 - Revoked license tokens fail server-side verification.
 - Renewal extends the license by its option duration and records a `license.renewed` audit event.
+- **Deliver** reissues an active, unexpired token from the saved license claims when the original token was not saved. It keeps the same license ID and activation binding.
 
 A revoked license cannot be renewed.
 

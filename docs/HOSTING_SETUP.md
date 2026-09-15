@@ -408,7 +408,7 @@ A license issued for one profile must not activate another application.
 The application should generate an installation ID and instance key pair locally. A customer activation request should include:
 
 - `app_id`
-- `installation_id`
+- `instance_id`
 - `instance_key_id`
 - `instance_public_key`
 - Application version
