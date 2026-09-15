@@ -1,0 +1,18 @@
+---
+name: Stale
+
+# yamllint disable-line rule:truthy
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  workflows:
+    uses: >-
+      hassio-addons/workflows/.github/workflows/stale.yaml@bf6ee19d0cb5ecaf6d1205d83a48c32ffe6145a7

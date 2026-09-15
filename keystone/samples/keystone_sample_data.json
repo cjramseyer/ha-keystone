@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "application_profiles": [
+    {
+      "id": "app_profile_example",
+      "app_id": "example-app",
+      "name": "Example App",
+      "installation_limit": 1,
+      "token_audience": "example-app",
+      "features": ["advanced_reports"],
+      "plans": ["base", "pro"],
+      "license_options": [
+        {
+          "id": "trial-30",
+          "type": "trial",
+          "label": "30-day trial",
+          "length_days": 30
+        },
+        {
+          "id": "pro-365",
+          "type": "pro",
+          "label": "Pro - 1 year",
+          "length_days": 365
+        }
+      ]
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_example",
+      "name": "Example Customer",
+      "email": "customer@example.invalid"
+    }
+  ],
+  "licenses": [],
+  "activations": [],
+  "audit_events": []
+}

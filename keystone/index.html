@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Pro App licensing operations portal" />
+    <title>Keystone Licensing Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="palette-overrides.css" />
+  </head>
+  <body>
+    <div class="auth-gate" id="auth-gate">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <strong>keystone</strong>
+        </div>
+        <p class="eyebrow">PRIVATE ISSUER CONSOLE</p>
+        <h1>Sign in to Keystone<span>.</span></h1>
+        <p class="auth-copy">
+          Administrator access is required to issue, revoke, and inspect
+          licenses.
+        </p>
+        <form id="login-form">
+          <label
+            >Administrator<input
+              id="login-email"
+              value="admin"
+              autocomplete="username"
+              required /></label
+          ><label
+            >Password<input
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              required
+          /></label>
+          <p class="auth-error" id="auth-error" hidden></p>
+          <button class="primary-button" type="submit">
+            Continue <span>→</span>
+          </button>
+        </form>
+        <small class="auth-hint"
+          >Local issuer mode · session protected by HttpOnly cookie</small
+        >
+      </div>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div><strong>keystone</strong><small>LICENSE OPERATIONS</small></div>
+        </div>
+        <div class="workspace-switcher">
+          <div class="switcher-icon">HA</div>
+          <div class="switcher-copy">
+            <span>Home Assistant</span><small>App workspace</small>
+          </div>
+          <span class="chevron">⌄</span>
+        </div>
+        <nav class="primary-nav" aria-label="Primary navigation">
+          <p class="nav-label">Workspace</p>
+          <button class="nav-item active" data-view="overview">
+            <span class="nav-icon">◈</span>Overview</button
+          ><button class="nav-item" data-view="licenses">
+            <span class="nav-icon">▣</span>Licenses <b>12</b></button
+          ><button class="nav-item" data-view="customers">
+            <span class="nav-icon">◎</span>Customers</button
+          ><button class="nav-item" data-view="activations">
+            <span class="nav-icon">⌁</span>Activations
+          </button>
+          <p class="nav-label settings-label">Configuration</p>
+          <button class="nav-item" data-view="profiles">
+            <span class="nav-icon">⊞</span>App profiles</button
+          ><button class="nav-item" data-view="keys">
+            <span class="nav-icon">◇</span>Signing keys</button
+          ><button class="nav-item" data-view="audit">
+            <span class="nav-icon">≡</span>Audit log</button
+          ><button class="nav-item" data-view="settings">
+            <span class="nav-icon">⚙</span>Configuration
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="security-note">
+            <span class="status-dot"></span>
+            <div>
+              <strong>Issuer protected</strong
+              ><small>Ed25519 key vault online</small>
+            </div>
+          </div>
+          <button class="user-row" id="open-user-profile" type="button">
+            <div class="avatar" id="user-avatar">CR</div>
+            <div>
+              <strong id="user-display-name">Casey R.</strong
+              ><small>Administrator</small>
+            </div>
+            <span class="more">•••</span>
+          </button>
+        </div>
+      </aside>
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs">
+            <span>Workspace</span><i>/</i
+            ><strong id="breadcrumb-current">Overview</strong>
+          </div>
+          <div class="topbar-actions">
+            <div class="live-status">
+              <span class="status-dot"></span>All systems operational
+            </div>
+            <button
+              class="icon-button"
+              id="notifications-button"
+              aria-label="Notifications"
+              aria-expanded="false"
+            >
+              ♧<em></em></button
+            ><a
+              class="help-button"
+              href="https://github.com/cjramseyer/ha-keystone/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open GitHub issues"
+              >?</a
+            >
+          </div>
+        </header>
+        <div class="content-wrap">
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow">MONDAY, SEPTEMBER 14, 2026</p>
+              <h1 id="page-title">Good morning, Casey<span>.</span></h1>
+              <p class="subheading">
+                Keep an eye on the licenses powering your applications.
+              </p>
+            </div>
+            <button class="primary-button" id="open-issue">
+              <span>＋</span> Issue license
+            </button>
+          </section>
+          <section class="metrics-grid" aria-label="License metrics">
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>ACTIVE LICENSES</span
+                ><span class="metric-icon mint">▣</span>
+              </div>
+              <strong>1,284</strong>
+              <p>
+                <span class="trend-up">↗ 8.4%</span> <span>vs. last month</span>
+              </p>
+              <div class="sparkline mint-line">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>TRIALS IN PROGRESS</span
+                ><span class="metric-icon yellow">◷</span>
+              </div>
+              <strong>86</strong>
+              <p>
+                <span class="trend-up">↗ 12.1%</span>
+                <span>vs. last month</span>
+              </p>
+              <div class="sparkline yellow-line">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>RENEWAL RATE</span><span class="metric-icon blue">↻</span>
+              </div>
+              <strong>94.6<span class="unit">%</span></strong>
+              <p>
+                <span class="trend-up">↗ 2.6%</span> <span>vs. last month</span>
+              </p>
+              <div class="sparkline blue-line">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>MONTHLY REVENUE</span
+                ><span class="metric-icon coral">$</span>
+              </div>
+              <strong>$18,420</strong>
+              <p>
+                <span class="trend-up">↗ 14.8%</span>
+                <span>vs. last month</span>
+              </p>
+              <div class="sparkline coral-line">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </article>
+          </section>
+          <section class="dashboard-grid" id="overview-grid">
+            <div class="panel licenses-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Licenses needing attention</h2>
+                  <p>
+                    Renewals and activations across your Home Assistant apps.
+                  </p>
+                </div>
+                <button class="text-button" data-view="licenses">
+                  View all <span>→</span>
+                </button>
+              </div>
+              <div class="table-toolbar">
+                <div class="tabs">
+                  <button class="tab active">All <b>12</b></button
+                  ><button class="tab">Expiring <b>4</b></button
+                  ><button class="tab">Trial <b>8</b></button>
+                </div>
+                <button class="filter-button">Filter <span>≡</span></button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Application</th>
+                      <th>Plan</th>
+                      <th>Expires</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="license-table">
+                    <tr>
+                      <td>
+                        <div class="customer-cell">
+                          <div class="customer-avatar amber">HM</div>
+                          <div>
+                            <strong>Harbor House</strong
+                            ><small>admin@harborhouse.io</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="app-name"
+                          ><i class="app-dot bartender"></i>HA Companion</span
+                        >
+                      </td>
+                      <td><span class="plan pro">PRO</span></td>
+                      <td>
+                        <strong>Sep 18, 2026</strong
+                        ><small class="muted">in 4 days</small>
+                      </td>
+                      <td>
+                        <span class="status-pill warning"><i></i>Expiring</span>
+                      </td>
+                      <td>
+                        <button class="row-menu" aria-label="More actions">
+                          •••
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="customer-cell">
+                          <div class="customer-avatar plum">SH</div>
+                          <div>
+                            <strong>Summit Home</strong
+                            ><small>hello@summithome.co</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="app-name"
+                          ><i class="app-dot bartender"></i>HA Companion</span
+                        >
+                      </td>
+                      <td><span class="plan trial">TRIAL</span></td>
+                      <td>
+                        <strong>Sep 22, 2026</strong
+                        ><small class="muted">in 8 days</small>
+                      </td>
+                      <td>
+                        <span class="status-pill trial-status"
+                          ><i></i>Trial</span
+                        >
+                      </td>
+                      <td>
+                        <button class="row-menu" aria-label="More actions">
+                          •••
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="customer-cell">
+                          <div class="customer-avatar blue-avatar">NH</div>
+                          <div>
+                            <strong>Northstar Home</strong
+                            ><small>ops@northstarhome.io</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="app-name"
+                          ><i class="app-dot menu"></i>HA Voice</span
+                        >
+                      </td>
+                      <td><span class="plan pro">PRO</span></td>
+                      <td>
+                        <strong>Sep 29, 2026</strong
+                        ><small class="muted">in 15 days</small>
+                      </td>
+                      <td>
+                        <span class="status-pill warning"><i></i>Expiring</span>
+                      </td>
+                      <td>
+                        <button class="row-menu" aria-label="More actions">
+                          •••
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="customer-cell">
+                          <div class="customer-avatar green-avatar">SH</div>
+                          <div>
+                            <strong>Silverleaf Home</strong
+                            ><small>team@silverleafhome.com</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="app-name"
+                          ><i class="app-dot bartender"></i>HA Companion</span
+                        >
+                      </td>
+                      <td><span class="plan base">BASE</span></td>
+                      <td>
+                        <strong>Oct 04, 2026</strong
+                        ><small class="muted">in 20 days</small>
+                      </td>
+                      <td>
+                        <span class="status-pill active-status"
+                          ><i></i>Active</span
+                        >
+                      </td>
+                      <td>
+                        <button class="row-menu" aria-label="More actions">
+                          •••
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <aside class="side-column">
+              <div class="panel profile-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>App profiles</h2>
+                    <p>2 active products</p>
+                  </div>
+                  <button class="round-button" aria-label="Add app profile">
+                    ＋
+                  </button>
+                </div>
+                <div class="profile-item selected">
+                  <div class="profile-logo bartender-logo">HA</div>
+                  <div class="profile-info">
+                    <strong>HA Companion</strong
+                    ><small>1,047 active licenses</small>
+                  </div>
+                  <span class="profile-arrow">→</span>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-logo menu-logo">HV</div>
+                  <div class="profile-info">
+                    <strong>HA Voice</strong><small>237 active licenses</small>
+                  </div>
+                  <span class="profile-arrow">→</span>
+                </div>
+                <button class="manage-button" data-view="profiles">
+                  Manage profiles <span>→</span>
+                </button>
+              </div>
+              <div class="panel activity-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Recent activity</h2>
+                    <p>Latest events from your workspace.</p>
+                  </div>
+                  <button class="text-button" data-view="audit">
+                    See log <span>→</span>
+                  </button>
+                </div>
+                <div class="activity-list">
+                  <div class="activity-item">
+                    <div class="activity-icon mint-bg">✓</div>
+                    <div>
+                      <strong>License issued</strong>
+                      <p>HA Companion Pro for <b>Maple Street Home</b></p>
+                      <small>12 minutes ago</small>
+                    </div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon blue-bg">↻</div>
+                    <div>
+                      <strong>Activation renewed</strong>
+                      <p><b>Silverleaf Home</b> · installation 02</p>
+                      <small>46 minutes ago</small>
+                    </div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon coral-bg">×</div>
+                    <div>
+                      <strong>License revoked</strong>
+                      <p>HA Voice Base for <b>Juniper Home</b></p>
+                      <small>2 hours ago</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </section>
+          <section class="view-panel" id="view-panel" hidden></section>
+          <footer class="page-footer">
+            <span>Keystone Licensing Portal <b>·</b> v0.9.4</span
+            ><span
+              >Last synced <strong>just now</strong> <i class="status-dot"></i
+            ></span>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <div class="modal-backdrop" id="issue-modal" hidden>
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">MANUAL ISSUANCE</p>
+            <h2 id="modal-title">Issue a license</h2>
+            <p>
+              Create a signed trial or paid license for a verified Home
+              Assistant instance.
+            </p>
+          </div>
+          <button class="close-button" id="close-modal" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <form id="license-form">
+          <label
+            >Application profile<select id="application">
+              <option value="home-assistant-companion">HA Companion</option>
+              <option value="home-assistant-voice">HA Voice</option>
+            </select></label
+          >
+          <div class="form-grid">
+            <label
+              >Customer name<input
+                id="customer"
+                required
+                placeholder="e.g. Maple Street Home" /></label
+            ><label
+              >Customer email<input
+                id="email"
+                type="email"
+                required
+                placeholder="owner@example.com"
+            /></label>
+          </div>
+          <div class="form-grid">
+            <label
+              >License plan<select id="plan">
+                <option value="pro">Pro</option>
+                <option value="base">Base</option>
+              </select></label
+            ><label
+              >License type<select id="license-type">
+                <option value="paid">Paid</option>
+                <option value="trial">30-day trial</option>
+              </select></label
+            >
+          </div>
+          <label
+            >Home / instance value<input
+              id="instance"
+              required
+              placeholder="Human-readable home or instance name" /></label
+          ><label
+            >Instance activation request<textarea
+              id="activation"
+              required
+              placeholder="JSON from the Home Assistant app, including public key and signature"
+            ></textarea
+            ><small class="field-hint"
+              >The instance key proof is validated before signing. Private keys
+              never leave the Home Assistant installation.</small
+            ></label
+          >
+          <p class="form-error" id="form-error" hidden></p>
+          <div class="modal-footer">
+            <button type="button" class="secondary-button" id="cancel-modal">
+              Cancel</button
+            ><button type="submit" class="primary-button">
+              Validate &amp; issue <span>→</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="toast" id="toast" role="status">
+      <span class="toast-check">✓</span>
+      <div>
+        <strong>License issued</strong
+        ><small>The signed token is ready to deliver.</small>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="customer-modal" hidden>
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="customer-modal-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">CUSTOMER DIRECTORY</p>
+            <h2 id="customer-modal-title">Add customer</h2>
+            <p>Create a customer record before issuing a license.</p>
+          </div>
+          <button
+            class="close-button"
+            id="close-customer-modal"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <form id="customer-form">
+          <label
+            >Customer name<input
+              id="customer-name"
+              required
+              placeholder="e.g. Maple Street Home" /></label
+          ><label
+            >Customer email<input
+              id="customer-email"
+              type="email"
+              required
+              placeholder="owner@example.com"
+          /></label>
+          <p class="form-error" id="customer-form-error" hidden></p>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="secondary-button"
+              id="cancel-customer-modal"
+            >
+              Cancel</button
+            ><button type="submit" class="primary-button">
+              Create customer <span>→</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="modal-backdrop" id="profile-modal" hidden>
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-modal-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">APPLICATION CONFIGURATION</p>
+            <h2 id="profile-modal-title">Add app profile</h2>
+            <p>Register an application and its licensing rules.</p>
+          </div>
+          <button
+            class="close-button"
+            id="close-profile-modal"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <form id="profile-form">
+          <div class="form-grid">
+            <label
+              >Profile ID<input
+                id="profile-app-id"
+                required
+                pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                placeholder="e.g. home-assistant-dashboard" /></label
+            ><label
+              >Display name<input
+                id="profile-name"
+                required
+                placeholder="e.g. HA Dashboard"
+            /></label>
+          </div>
+          <div class="form-grid">
+            <label
+              >Trial days<input
+                id="profile-trial-days"
+                type="number"
+                min="1"
+                value="30"
+                required /></label
+            ><label
+              >Installation limit<input
+                id="profile-installation-limit"
+                type="number"
+                min="1"
+                value="2"
+                required
+            /></label>
+          </div>
+          <label
+            >Feature entitlements<input
+              id="profile-features"
+              placeholder="remote_access, advanced_automations"
+          /></label>
+          <p class="form-error" id="profile-form-error" hidden></p>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="secondary-button"
+              id="cancel-profile-modal"
+            >
+              Cancel</button
+            ><button type="submit" class="primary-button">
+              Create profile <span>→</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="modal-backdrop" id="user-profile-modal" hidden>
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="user-profile-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">ADMINISTRATOR PROFILE</p>
+            <h2 id="user-profile-title">Edit your profile</h2>
+            <p>Update the name and email shown for the portal administrator.</p>
+          </div>
+          <button
+            class="close-button"
+            id="close-user-profile"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <form id="user-profile-form">
+          <label
+            >Display name<input
+              id="user-profile-name"
+              required
+              placeholder="e.g. Casey R." /></label
+          ><label
+            >Email<input
+              id="user-profile-email"
+              type="email"
+              required
+              placeholder="admin@example.com"
+          /></label>
+          <p class="form-error" id="user-profile-error" hidden></p>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="secondary-button"
+              id="cancel-user-profile"
+            >
+              Cancel</button
+            ><button type="submit" class="primary-button">
+              Save changes <span>→</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="modal-backdrop" id="license-delivery-modal" hidden>
+      <section
+        class="modal delivery-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="license-delivery-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">LICENSE DELIVERY</p>
+            <h2 id="license-delivery-title">License ready</h2>
+            <p>
+              Copy or download this signed token and provide it to the customer.
+              It is not stored by the portal.
+            </p>
+          </div>
+          <button
+            class="close-button"
+            id="close-license-delivery"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div class="delivery-summary" id="license-delivery-summary"></div>
+        <textarea
+          class="license-token-output"
+          id="license-token-output"
+          readonly
+          aria-label="Signed license token"
+        ></textarea>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="secondary-button"
+            id="copy-license-token"
+          >
+            Copy token</button
+          ><button
+            type="button"
+            class="primary-button"
+            id="download-license-token"
+          >
+            Download token <span>↓</span>
+          </button>
+        </div>
+      </section>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
