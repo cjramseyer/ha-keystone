@@ -1,0 +1,5 @@
+.data/
+.secrets/
+node_modules/
+*.log
+depr/

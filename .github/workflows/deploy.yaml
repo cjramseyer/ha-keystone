@@ -1,0 +1,60 @@
+---
+name: Deploy
+
+# yamllint disable-line rule:truthy
+on:
+  release:
+    types:
+      - published
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  workflows:
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    uses: >-
+      hassio-addons/workflows/.github/workflows/addon-deploy.yaml@bf6ee19d0cb5ecaf6d1205d83a48c32ffe6145a7
+    with:
+      repository: ha-addons
+      repository_edge: ha-addons-edge
+      repository_beta: ha-addons-beta
+    secrets:
+      DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+
+  tag-dev-alias:
+    name: Create dev image aliases
+    needs: workflows
+    if: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USERNAME: ${{ github.actor }}
+        run: |
+          echo "$GHCR_TOKEN" |
+            docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+      - name: Tag arch images as dev
+        run: |
+          for arch in amd64 aarch64; do
+            image="ghcr.io/${{ github.repository_owner }}/ha-keystone/${arch}"
+            docker buildx imagetools create \
+              --tag "${image}:dev" \
+              "${image}:edge"
+          done
+
+      - name: Tag multi-arch image as dev
+        run: |
+          docker buildx imagetools create \
+            --tag "ghcr.io/${{ github.repository_owner }}/ha-keystone:dev" \
+            "ghcr.io/${{ github.repository_owner }}/ha-keystone:edge"
