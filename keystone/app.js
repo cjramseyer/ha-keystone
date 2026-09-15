@@ -38,7 +38,9 @@ function setPalette(palette) {
   localStorage.setItem(paletteStorageKey, selectedPalette);
 }
 
-setDarkMode(localStorage.getItem(darkModeStorageKey) === "true");
+const savedDarkMode = localStorage.getItem(darkModeStorageKey);
+const defaultDarkMode = savedDarkMode === null ? true : savedDarkMode === "true";
+setDarkMode(defaultDarkMode);
 setPalette(localStorage.getItem(paletteStorageKey) || "meadow");
 
 function updateLicenseOptions(appId) {
