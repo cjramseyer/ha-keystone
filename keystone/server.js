@@ -71,6 +71,13 @@ const profiles = {
   },
 };
 
+function resolveAdminPassword() {
+  const configuredPassword = process.env.PORTAL_ADMIN_PASSWORD;
+  if (typeof configuredPassword === "string" && configuredPassword.trim())
+    return configuredPassword.trim();
+  return "change-me-local";
+}
+
 function ensureRuntimeFiles() {
   fs.mkdirSync(dataDirectory, { recursive: true });
   fs.mkdirSync(secretsDirectory, { recursive: true });
@@ -80,8 +87,12 @@ function ensureRuntimeFiles() {
       crypto.randomBytes(32).toString("hex"),
       { mode: 0o600 },
     );
+  const configuredPassword =
+    typeof process.env.PORTAL_ADMIN_PASSWORD === "string"
+      ? process.env.PORTAL_ADMIN_PASSWORD.trim()
+      : "";
   if (!fs.existsSync(authFile)) {
-    const password = process.env.PORTAL_ADMIN_PASSWORD || "change-me-local";
+    const password = configuredPassword || "change-me-local";
     fs.writeFileSync(
       authFile,
       JSON.stringify(
@@ -97,11 +108,20 @@ function ensureRuntimeFiles() {
       { mode: 0o600 },
     );
     console.log(
-      `Admin password initialized from ${process.env.PORTAL_ADMIN_PASSWORD ? "PORTAL_ADMIN_PASSWORD" : "change-me-local fallback"}.`,
+      `Admin password initialized from ${configuredPassword ? "PORTAL_ADMIN_PASSWORD" : "change-me-local fallback"}.`,
     );
   } else {
     const auth = JSON.parse(fs.readFileSync(authFile, "utf8"));
     let changed = false;
+    if (
+      configuredPassword &&
+      (!auth.password_hash ||
+        !verifyPassword(configuredPassword, auth.password_hash))
+    ) {
+      auth.password_hash = hashPassword(configuredPassword);
+      changed = true;
+      console.log("Admin password updated from PORTAL_ADMIN_PASSWORD.");
+    }
     if (!auth.username) {
       auth.username = "admin";
       changed = true;
