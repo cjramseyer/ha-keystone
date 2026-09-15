@@ -3,7 +3,7 @@ name: PR Labels
 
 # yamllint disable-line rule:truthy
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - labeled
@@ -16,4 +16,5 @@ permissions:
 
 jobs:
   workflows:
-    uses: hassio-addons/workflows/.github/workflows/pr-labels.yaml@main
+    uses: >-
+      hassio-addons/workflows/.github/workflows/pr-labels.yaml@bf6ee19d0cb5ecaf6d1205d83a48c32ffe6145a7
