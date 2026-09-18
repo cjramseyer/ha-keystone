@@ -516,10 +516,22 @@ async function handleApi(request, response) {
   if (!isAuthenticated(request))
     return sendError(response, 401, "Administrator authentication required");
   if (request.method === "GET" && pathname === "/api/issuer/public-key") {
+    const publicKey = crypto.createPublicKey(fs.readFileSync(publicKeyFile));
+    const exportedJwk = publicKey.export({ format: "jwk" });
+    const publicKeyJwk = {
+      kty: exportedJwk.kty,
+      crv: exportedJwk.crv,
+      x: exportedJwk.x,
+      kid: "issuer-ed25519-01",
+      alg: "EdDSA",
+      use: "sig",
+    };
     return sendJson(response, 200, {
       key_id: "issuer-ed25519-01",
       algorithm: "Ed25519",
-      public_key_pem: fs.readFileSync(publicKeyFile, "utf8"),
+      public_key_base64url: exportedJwk.x,
+      public_key_jwk: publicKeyJwk,
+      public_key_pem: publicKey.export({ type: "spki", format: "pem" }),
     });
   }
   if (request.method === "PUT" && pathname === "/api/auth/profile") {
@@ -760,7 +772,7 @@ async function handleApi(request, response) {
       token_audience: String(body.token_audience || appId),
       features,
       plans,
-      license_options: [],
+      license_options: defaultLicenseOptions(),
     };
     const data = readData();
     profiles[appId] = profile;
@@ -980,12 +992,25 @@ async function handleApi(request, response) {
         400,
         "Customer and instance information are required",
       );
+    const activationRequest = body.activation_request;
+    if (
+      !activationRequest ||
+      typeof activationRequest !== "object" ||
+      Array.isArray(activationRequest)
+    )
+      return sendError(response, 400, "Activation request must be an object");
+    if (
+      String(activationRequest.app_id || "").trim().toLowerCase() !==
+      profile.app_id
+    )
+      return sendError(
+        response,
+        400,
+        `Activation request app_id does not match the selected ${profile.name} profile`,
+      );
     let instanceHash;
     try {
-      instanceHash = verifyActivationRequest({
-        ...body.activation_request,
-        app_id: profile.app_id,
-      });
+      instanceHash = verifyActivationRequest(activationRequest);
     } catch (error) {
       return sendError(response, 400, error.message);
     }
@@ -1025,8 +1050,8 @@ async function handleApi(request, response) {
       key_id: "issuer-ed25519-01",
     };
     const token = signLicense(payload);
-    const activationRequest = JSON.parse(
-      JSON.stringify({ ...body.activation_request, app_id: profile.app_id }),
+    const normalizedActivationRequest = JSON.parse(
+      JSON.stringify(activationRequest),
     );
     if (!existingCustomer)
       data.customers.push({
@@ -1038,7 +1063,7 @@ async function handleApi(request, response) {
     data.licenses.push({
       ...payload,
       license_payload: JSON.parse(JSON.stringify(payload)),
-      activation_request: activationRequest,
+      activation_request: normalizedActivationRequest,
       status: "active",
       token_hash: crypto.createHash("sha256").update(token).digest("hex"),
       created_at: now.toISOString(),
