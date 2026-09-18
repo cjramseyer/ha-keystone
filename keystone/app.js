@@ -362,7 +362,9 @@ async function showView(view) {
           const format = button.dataset.copyIssuerKey;
           const originalLabel = button.textContent;
           const copied = await copyTextToClipboard(keyValues[format]);
-          button.textContent = copied ? "Copied" : "Copy failed - select manually";
+          button.textContent = copied
+            ? "Copied"
+            : "Copy failed - select manually";
           window.setTimeout(() => {
             button.textContent = originalLabel;
           }, 1800);
