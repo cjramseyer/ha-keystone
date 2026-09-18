@@ -1000,8 +1000,9 @@ async function handleApi(request, response) {
     )
       return sendError(response, 400, "Activation request must be an object");
     if (
-      String(activationRequest.app_id || "").trim().toLowerCase() !==
-      profile.app_id
+      String(activationRequest.app_id || "")
+        .trim()
+        .toLowerCase() !== profile.app_id
     )
       return sendError(
         response,
