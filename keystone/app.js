@@ -1275,12 +1275,64 @@ document
   });
 
 const deliveryModal = document.getElementById("license-delivery-modal");
+let currentDeliveryToken = "";
+let currentDeliveryFormat = "jwt";
+function toBase64Url(text) {
+  return window
+    .btoa(text)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+function fromBase64Url(text) {
+  const padded = text.replace(/-/g, "+").replace(/_/g, "/");
+  return window.atob(
+    padded.padEnd(padded.length + ((4 - (padded.length % 4)) % 4), "="),
+  );
+}
+function decodedTokenPayload(token) {
+  const [, body] = token.split(".");
+  if (!body) return "Unable to decode token payload";
+  try {
+    return JSON.stringify(JSON.parse(fromBase64Url(body)), null, 2);
+  } catch {
+    return "Unable to decode token payload";
+  }
+}
+function renderDeliveryToken() {
+  const output = document.getElementById("license-token-output");
+  if (currentDeliveryFormat === "base64url")
+    output.value = toBase64Url(currentDeliveryToken);
+  else if (currentDeliveryFormat === "json")
+    output.value = decodedTokenPayload(currentDeliveryToken);
+  else output.value = currentDeliveryToken;
+}
 function showLicenseDelivery(result) {
   deliveryModal.hidden = false;
-  document.getElementById("license-token-output").value = result.token;
+  currentDeliveryToken = result.token;
+  currentDeliveryFormat = "jwt";
+  document
+    .querySelectorAll("#token-format-options [data-token-format]")
+    .forEach((button) =>
+      button.classList.toggle("selected", button.dataset.tokenFormat === "jwt"),
+    );
+  renderDeliveryToken();
   document.getElementById("license-delivery-summary").textContent =
     `${result.license.app_id} · ${result.license.option_type} · expires ${new Date(result.license.expires_at).toLocaleDateString()}`;
 }
+document
+  .getElementById("token-format-options")
+  .addEventListener("click", (event) => {
+    const button = event.target.closest("[data-token-format]");
+    if (!button) return;
+    currentDeliveryFormat = button.dataset.tokenFormat;
+    document
+      .querySelectorAll("#token-format-options [data-token-format]")
+      .forEach((choice) =>
+        choice.classList.toggle("selected", choice === button),
+      );
+    renderDeliveryToken();
+  });
 function closeLicenseDelivery() {
   deliveryModal.hidden = true;
 }
@@ -1305,10 +1357,23 @@ document
   .getElementById("download-license-token")
   .addEventListener("click", () => {
     const token = document.getElementById("license-token-output").value;
-    const blob = new Blob([token], { type: "text/plain;charset=utf-8" });
+    const downloadNames = {
+      jwt: "keystone-license.jwt",
+      base64url: "keystone-license.b64url.txt",
+      json: "keystone-license.json",
+    };
+    const mimeTypes = {
+      jwt: "text/plain;charset=utf-8",
+      base64url: "text/plain;charset=utf-8",
+      json: "application/json;charset=utf-8",
+    };
+    const blob = new Blob([token], {
+      type: mimeTypes[currentDeliveryFormat] || "text/plain;charset=utf-8",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "keystone-license.token";
+    link.download =
+      downloadNames[currentDeliveryFormat] || "keystone-license.token";
     link.click();
     URL.revokeObjectURL(link.href);
   });

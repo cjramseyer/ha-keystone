@@ -724,6 +724,30 @@
           </button>
         </div>
         <div class="delivery-summary" id="license-delivery-summary"></div>
+        <div
+          class="token-format-options"
+          id="token-format-options"
+          role="group"
+          aria-label="Token format"
+        >
+          <button
+            type="button"
+            class="format-choice selected"
+            data-token-format="jwt"
+          >
+            JWT
+          </button>
+          <button
+            type="button"
+            class="format-choice"
+            data-token-format="base64url"
+          >
+            Base64URL
+          </button>
+          <button type="button" class="format-choice" data-token-format="json">
+            JSON Payload
+          </button>
+        </div>
         <textarea
           class="license-token-output"
           id="license-token-output"
