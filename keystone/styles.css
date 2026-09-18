@@ -1406,6 +1406,23 @@ th:first-child {
   justify-content: flex-end;
   gap: 9px;
 }
+.token-format-options {
+  display: flex;
+  gap: 7px;
+  margin-top: 14px;
+}
+.format-choice {
+  background: #f2f5f3;
+  color: #5e716c;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.format-choice.selected {
+  background: var(--mint-strong);
+  color: #fff;
+}
 .secondary-button {
   background: #f2f5f3;
   color: #5e716c;
