@@ -1277,13 +1277,6 @@ document
 const deliveryModal = document.getElementById("license-delivery-modal");
 let currentDeliveryToken = "";
 let currentDeliveryFormat = "jwt";
-function toBase64Url(text) {
-  return window
-    .btoa(text)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
 function fromBase64Url(text) {
   const padded = text.replace(/-/g, "+").replace(/_/g, "/");
   return window.atob(
@@ -1301,9 +1294,7 @@ function decodedTokenPayload(token) {
 }
 function renderDeliveryToken() {
   const output = document.getElementById("license-token-output");
-  if (currentDeliveryFormat === "base64url")
-    output.value = toBase64Url(currentDeliveryToken);
-  else if (currentDeliveryFormat === "json")
+  if (currentDeliveryFormat === "json")
     output.value = decodedTokenPayload(currentDeliveryToken);
   else output.value = currentDeliveryToken;
 }
@@ -1359,12 +1350,10 @@ document
     const token = document.getElementById("license-token-output").value;
     const downloadNames = {
       jwt: "keystone-license.jwt",
-      base64url: "keystone-license.b64url.txt",
       json: "keystone-license.json",
     };
     const mimeTypes = {
       jwt: "text/plain;charset=utf-8",
-      base64url: "text/plain;charset=utf-8",
       json: "application/json;charset=utf-8",
     };
     const blob = new Blob([token], {
