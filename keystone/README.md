@@ -22,9 +22,7 @@ The add-on listens on internal port `3000`, binds to `0.0.0.0`, and enables ingr
 
 The default password is `change-me-local` only when the add-on starts without a configured password and has no existing `/data/auth.json`. Set a real password before the first start.
 
-If a previous installation left an old `/data/auth.json` behind, update the add-on configuration with the desired `portal_admin_password`, save, and restart the add-on. The server now replaces the stored password hash whenever a configured value is present and differs from the current one.
-
-If you intentionally need to reset the admin login, stop the add-on, delete `/data/auth.json`, set the new `portal_admin_password`, and start it again. This recreates the admin record with the new password.
+To set or reset the login, enter the desired `portal_admin_password` in the add-on Configuration tab, save, and restart the add-on. Keystone replaces the stored password hash during startup, so no SSH access or file deletion is required. Sign in with the username `admin` and the configured password.
 
 ## Persistent storage
 
@@ -51,12 +49,10 @@ Back up `/data` securely. Never copy the private signing key into a public appli
 
 Check the add-on log first. Common causes include:
 
-- The add-on password was not set before first start.
+- The configuration was saved but the add-on was not restarted.
 - The `/data` volume is not writable.
-- A previous installation has a stale or intentionally preserved `auth.json`.
+- The installed add-on has not been updated to the latest version.
 - Direct port access is blocked; use Home Assistant ingress.
-
-For a password reset in a disposable test installation, stop the add-on, remove `/data/auth.json`, set `portal_admin_password`, and start it again. Do not do this on a production installation without preserving the existing data and audit records.
 
 ## Production warning
 

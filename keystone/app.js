@@ -474,7 +474,8 @@ async function showView(view) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
+  const url = new URL(path.replace(/^\//, ""), document.baseURI);
+  const response = await fetch(url, {
     credentials: "same-origin",
     headers: { "Content-Type": "application/json", ...options.headers },
     ...options,
