@@ -8,6 +8,20 @@ const formError = document.getElementById("form-error");
 const overviewGrid = document.getElementById("overview-grid");
 const viewPanel = document.getElementById("view-panel");
 const userProfileModal = document.getElementById("user-profile-modal");
+function getTimeOfDayGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+document.getElementById("page-date").textContent = new Date()
+  .toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+  .toUpperCase();
 // Falls back to execCommand since the Clipboard API is often blocked inside the HA ingress iframe.
 async function copyTextToClipboard(text) {
   if (navigator.clipboard && window.isSecureContext) {
@@ -542,7 +556,7 @@ function updateUserProfile(profile) {
   document.getElementById("user-profile-name").value = profile.name;
   document.getElementById("user-profile-email").value = profile.email;
   if (document.getElementById("breadcrumb-current").textContent === "Overview")
-    pageTitle.innerHTML = `Good morning, ${escapeHtml(profile.name)}<span>.</span>`;
+    pageTitle.innerHTML = `${getTimeOfDayGreeting()}, ${escapeHtml(profile.name)}<span>.</span>`;
 }
 
 async function loadDashboardMetrics() {
@@ -922,7 +936,7 @@ document.querySelectorAll("[data-view]").forEach((button) => {
       );
     breadcrumb.textContent = label;
     if (view !== "overview") pageTitle.innerHTML = `${label}<span>.</span>`;
-    else pageTitle.innerHTML = "Good morning, Casey<span>.</span>";
+    else pageTitle.innerHTML = `${getTimeOfDayGreeting()}, Casey<span>.</span>`;
     showView(view);
   });
 });
