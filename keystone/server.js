@@ -459,6 +459,8 @@ function serveStatic(request, response) {
   response.writeHead(200, {
     "Content-Type":
       contentTypes[path.extname(filePath)] || "application/octet-stream",
+    // Prevent stale UI assets from being served by browsers/ingress after an update.
+    "Cache-Control": "no-cache",
   });
   fs.createReadStream(filePath).pipe(response);
 }

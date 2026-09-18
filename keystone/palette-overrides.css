@@ -27,6 +27,14 @@
   color: #dcebe4;
   border-color: #41605a;
 }
+.dark-mode .format-choice {
+  background: #16332f;
+  color: #b7cbc4;
+}
+.dark-mode .format-choice.selected {
+  background: var(--mint-strong);
+  color: #fff;
+}
 :root {
   --ink: #172a2b;
   --muted: #718081;
