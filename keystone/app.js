@@ -8,6 +8,33 @@ const formError = document.getElementById("form-error");
 const overviewGrid = document.getElementById("overview-grid");
 const viewPanel = document.getElementById("view-panel");
 const userProfileModal = document.getElementById("user-profile-modal");
+// Falls back to execCommand since the Clipboard API is often blocked inside the HA ingress iframe.
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // fall through to legacy fallback
+    }
+  }
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "");
+  helper.style.position = "fixed";
+  helper.style.opacity = "0";
+  document.body.appendChild(helper);
+  helper.select();
+  helper.setSelectionRange(0, helper.value.length);
+  let succeeded = false;
+  try {
+    succeeded = document.execCommand("copy");
+  } catch {
+    succeeded = false;
+  }
+  document.body.removeChild(helper);
+  return succeeded;
+}
 const darkModeStorageKey = "keystone-dark-mode";
 const paletteStorageKey = "keystone-palette";
 const palettes = ["meadow", "ocean", "clay", "citrus"];
@@ -334,8 +361,8 @@ async function showView(view) {
         button.addEventListener("click", async () => {
           const format = button.dataset.copyIssuerKey;
           const originalLabel = button.textContent;
-          await navigator.clipboard.writeText(keyValues[format]);
-          button.textContent = "Copied";
+          const copied = await copyTextToClipboard(keyValues[format]);
+          button.textContent = copied ? "Copied" : "Copy failed - select manually";
           window.setTimeout(() => {
             button.textContent = originalLabel;
           }, 1800);
@@ -1336,10 +1363,12 @@ deliveryModal.addEventListener("click", (event) => {
 document
   .getElementById("copy-license-token")
   .addEventListener("click", async () => {
-    await navigator.clipboard.writeText(
+    const copied = await copyTextToClipboard(
       document.getElementById("license-token-output").value,
     );
-    document.getElementById("copy-license-token").textContent = "Copied";
+    document.getElementById("copy-license-token").textContent = copied
+      ? "Copied"
+      : "Copy failed - select manually";
     window.setTimeout(() => {
       document.getElementById("copy-license-token").textContent = "Copy token";
     }, 1800);
