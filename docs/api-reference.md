@@ -54,6 +54,19 @@ Request:
 
 Updates the administrator display name and email.
 
+## Issuer keys
+
+### `GET /api/issuer/public-key`
+
+Returns the active Ed25519 issuer public key in three equivalent formats:
+
+- `public_key_base64url`: raw 32-byte Ed25519 key for integrations such as BarTender.
+- `public_key_jwk`: preferred structured format for new integrations.
+- `public_key_pem`: SPKI PEM compatibility format.
+
+The response also includes `key_id` and `algorithm`. Applications must pin one of
+the advertised public-key representations locally before verifying license tokens.
+
 ## State
 
 ### `GET /api/state`

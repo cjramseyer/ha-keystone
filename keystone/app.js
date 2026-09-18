@@ -318,24 +318,34 @@ async function showView(view) {
     const keyRow = document.createElement("div");
     keyRow.className = "setting-row issuer-key-row";
     keyRow.innerHTML =
-      '<div class="issuer-key-copy"><strong>Issuer public key</strong><p>Copy this public key into licensed applications for local Ed25519 verification.</p><pre id="issuer-public-key">Loading public key...</pre></div><button type="button" class="secondary-button" id="copy-issuer-key">Copy key</button>';
+      '<div class="issuer-key-copy"><strong>Issuer public keys</strong><p>Use Base64URL for BarTender, JWK for new integrations, or PEM for applications that require SPKI.</p><div class="issuer-key-formats"><div class="issuer-key-format"><div><strong>Raw Base64URL</strong><small>BarTender-compatible Ed25519 key</small></div><pre id="issuer-key-base64url">Loading public key...</pre><button type="button" class="secondary-button" data-copy-issuer-key="base64url">Copy Base64URL</button></div><div class="issuer-key-format"><div><strong>JWK</strong><small>Preferred multi-application format</small></div><pre id="issuer-key-jwk">Loading public key...</pre><button type="button" class="secondary-button" data-copy-issuer-key="jwk">Copy JWK</button></div><div class="issuer-key-format"><div><strong>PEM</strong><small>SPKI compatibility format</small></div><pre id="issuer-key-pem">Loading public key...</pre><button type="button" class="secondary-button" data-copy-issuer-key="pem">Copy PEM</button></div></div></div>';
     document.querySelector(".settings-list").appendChild(keyRow);
     try {
       const issuer = await api("/api/issuer/public-key");
-      const keyElement = document.getElementById("issuer-public-key");
-      keyElement.textContent = issuer.public_key_pem;
-      document
-        .getElementById("copy-issuer-key")
-        .addEventListener("click", async () => {
-          await navigator.clipboard.writeText(issuer.public_key_pem);
-          document.getElementById("copy-issuer-key").textContent = "Copied";
+      const keyValues = {
+        base64url: issuer.public_key_base64url,
+        jwk: JSON.stringify(issuer.public_key_jwk, null, 2),
+        pem: issuer.public_key_pem,
+      };
+      Object.entries(keyValues).forEach(([format, value]) => {
+        document.getElementById(`issuer-key-${format}`).textContent = value;
+      });
+      document.querySelectorAll("[data-copy-issuer-key]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const format = button.dataset.copyIssuerKey;
+          const originalLabel = button.textContent;
+          await navigator.clipboard.writeText(keyValues[format]);
+          button.textContent = "Copied";
           window.setTimeout(() => {
-            document.getElementById("copy-issuer-key").textContent = "Copy key";
+            button.textContent = originalLabel;
           }, 1800);
         });
+      });
     } catch (error) {
-      document.getElementById("issuer-public-key").textContent =
-        `Unable to load public key: ${error.message}`;
+      document.getElementById("issuer-key-base64url").textContent =
+        `Unable to load issuer keys: ${error.message}`;
+      document.getElementById("issuer-key-jwk").textContent = "Unavailable";
+      document.getElementById("issuer-key-pem").textContent = "Unavailable";
     }
     darkModeToggle.addEventListener("change", () =>
       setDarkMode(darkModeToggle.checked),
