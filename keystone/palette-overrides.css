@@ -402,8 +402,26 @@
   flex: 1;
   min-width: 0;
 }
+.issuer-key-formats {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.issuer-key-format {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.issuer-key-format small {
+  display: block;
+  margin-top: 4px;
+  color: #899594;
+  font-size: 9px;
+}
 .issuer-key-copy pre {
-  margin: 10px 0 0;
+  margin: 0;
   padding: 10px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -422,6 +440,14 @@
 .issuer-key-row .secondary-button {
   flex-shrink: 0;
   margin-top: 0;
+}
+@media (max-width: 650px) {
+  .issuer-key-format {
+    grid-template-columns: 1fr;
+  }
+  .issuer-key-format .secondary-button {
+    justify-self: start;
+  }
 }
 .metrics-grid {
   grid-template-columns: repeat(3, 1fr);
