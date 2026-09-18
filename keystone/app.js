@@ -1286,7 +1286,9 @@ function toBase64Url(text) {
 }
 function fromBase64Url(text) {
   const padded = text.replace(/-/g, "+").replace(/_/g, "/");
-  return window.atob(padded.padEnd(padded.length + ((4 - (padded.length % 4)) % 4), "="));
+  return window.atob(
+    padded.padEnd(padded.length + ((4 - (padded.length % 4)) % 4), "="),
+  );
 }
 function decodedTokenPayload(token) {
   const [, body] = token.split(".");
@@ -1326,7 +1328,9 @@ document
     currentDeliveryFormat = button.dataset.tokenFormat;
     document
       .querySelectorAll("#token-format-options [data-token-format]")
-      .forEach((choice) => choice.classList.toggle("selected", choice === button));
+      .forEach((choice) =>
+        choice.classList.toggle("selected", choice === button),
+      );
     renderDeliveryToken();
   });
 function closeLicenseDelivery() {
