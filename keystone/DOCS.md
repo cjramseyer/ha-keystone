@@ -36,7 +36,7 @@ schema:
   portal_admin_password: password
 ```
 
-The startup script maps that option to `PORTAL_ADMIN_PASSWORD`. The server creates the administrator record only when `/data/auth.json` does not already exist.
+The startup script maps that option to `PORTAL_ADMIN_PASSWORD`. On every start, the server creates the administrator record if needed or updates its password hash when the configured password differs. This supports password resets entirely through the Home Assistant Configuration tab.
 
 ## Build and runtime
 

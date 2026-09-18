@@ -44,7 +44,7 @@ The server stores only a SHA-256 token hash in its persisted license metadata. T
 
 The Home Assistant add-on package is in [`keystone/`](keystone/). It binds the portal to Home Assistant ingress and persists local state under `/data`.
 
-For production, replace the local JSON store with a database, move issuer keys to a secret manager or KMS, configure MFA and rate limiting, and rotate the initial local credentials. Delete `.data/auth.json` before restarting if the first-run password needs to be initialized again.
+For production, replace the local JSON store with a database, move issuer keys to a secret manager or KMS, configure MFA and rate limiting, and rotate the initial local credentials. For the Home Assistant add-on, set or reset the administrator password through `portal_admin_password` in the Configuration tab and restart the add-on.
 
 Each application profile contains license options such as `trial-90` or `pro-730`. An option has a type (`trial` or `pro`) and `length_days`; issuing a license uses that configured duration rather than a fixed application-side default. Application profiles do not store trial or Pro lengths themselves.
 
