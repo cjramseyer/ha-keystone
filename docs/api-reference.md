@@ -156,7 +156,6 @@ Important request fields:
   "app_id": "another-app",
   "option_id": "trial-90-a1b2c3",
   "customer_id": "cust_123",
-  "instance_value": "Example Home",
   "activation_request": {
     "app_id": "another-app",
     "instance_id": "install_123",
@@ -176,7 +175,9 @@ Important request fields:
 }
 ```
 
-The activation signature covers:
+The license instance binding is derived from the verified activation request's
+`instance_id`, `instance_key_id`, and raw Ed25519 public key. The activation
+signature covers:
 
 ```text
 app_id.instance_id.instance_key_id.nonce
@@ -190,7 +191,7 @@ Extends expiration by the license option duration and records a renewal audit ev
 
 ### `POST /api/licenses/:license_id/reissue`
 
-Re-signs an active, unexpired license using its persisted claim snapshot and returns a new raw token for delivery. The license keeps the same ID, customer, expiration, features, and activation binding. The normalized activation request is also retained for support and audit purposes. The raw token is not persisted; only its replacement hash is stored.
+Re-signs an active, unexpired license using its persisted claim snapshot and returns a new raw token for delivery. The license keeps the same ID, customer, expiration, and features. Its instance binding is rebuilt from the retained, verified activation request, which also repairs licenses issued before activation-request-derived binding was introduced. The raw token is not persisted; only its replacement hash is stored.
 
 ### `POST /api/licenses/:license_id/revoke`
 
