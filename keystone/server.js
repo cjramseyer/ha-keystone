@@ -326,9 +326,10 @@ function verifyActivationRequest(request) {
     Buffer.from(signatureValue, "base64url"),
   );
   if (!valid) throw new Error("Instance proof signature is invalid");
+  const publicJwk = publicKey.export({ format: "jwk" });
   return crypto
     .createHash("sha256")
-    .update(publicKey.export({ type: "spki", format: "der" }))
+    .update(Buffer.from(publicJwk.x, "base64url"))
     .digest("base64url");
 }
 function signLicense(payload) {
@@ -625,6 +626,24 @@ async function handleApi(request, response) {
         "Only active, unexpired licenses can be reissued",
       );
     const payload = storedLicensePayload(license);
+    if (license.activation_request) {
+      const activationRequest = license.activation_request;
+      let instanceHash;
+      try {
+        instanceHash = verifyActivationRequest(activationRequest);
+      } catch (error) {
+        return sendError(response, 409, error.message);
+      }
+      payload.instance_binding = {
+        instance_value: activationRequest.instance_id,
+        instance_key_id: activationRequest.instance_key_id,
+        instance_public_key_sha256: instanceHash,
+      };
+      license.instance_binding = JSON.parse(
+        JSON.stringify(payload.instance_binding),
+      );
+      license.license_payload = JSON.parse(JSON.stringify(payload));
+    }
     const token = signLicense(payload);
     license.token_hash = crypto
       .createHash("sha256")
@@ -988,12 +1007,8 @@ async function handleApi(request, response) {
       return sendError(response, 400, "Selected customer was not found");
     const customerName = selectedCustomer?.name || body.customer_name;
     const customerEmail = selectedCustomer?.email || body.customer_email;
-    if (!customerName || !customerEmail || !body.instance_value)
-      return sendError(
-        response,
-        400,
-        "Customer and instance information are required",
-      );
+    if (!customerName || !customerEmail)
+      return sendError(response, 400, "Customer information is required");
     const activationRequest = body.activation_request;
     if (
       !activationRequest ||
@@ -1037,8 +1052,8 @@ async function handleApi(request, response) {
       customer_id: customerId,
       aud: profile.token_audience,
       instance_binding: {
-        instance_value: body.instance_value,
-        instance_key_id: body.activation_request.instance_key_id,
+        instance_value: activationRequest.instance_id,
+        instance_key_id: activationRequest.instance_key_id,
         instance_public_key_sha256: instanceHash,
       },
       option_id: option.id,

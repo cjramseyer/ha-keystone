@@ -906,7 +906,6 @@ document
           customer_name: document.getElementById("customer").value,
           customer_email: document.getElementById("email").value,
           option_id: document.getElementById("plan").value,
-          instance_value: document.getElementById("instance").value,
           activation_request: activationRequest,
         }),
       });
