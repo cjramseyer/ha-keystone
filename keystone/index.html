@@ -16,7 +16,7 @@
   </head>
   <body>
     <div class="auth-gate" id="auth-gate">
-      <div class="auth-card">
+      <div class="auth-card" id="login-card">
         <div class="auth-brand">
           <div class="brand-mark" aria-hidden="true">
             <span></span><span></span><span></span>
@@ -51,6 +51,45 @@
         <small class="auth-hint"
           >Local issuer mode · session protected by HttpOnly cookie</small
         >
+      <div class="auth-card" id="setup-card" hidden>
+        <div class="auth-brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <strong>keystone</strong>
+        </div>
+        <p class="eyebrow">FIRST-TIME SETUP</p>
+        <h1>Set up your workspace<span>.</span></h1>
+        <p class="auth-copy">
+          Add the administrator details used throughout this portal.
+        </p>
+        <form id="setup-form">
+          <label
+            >Administrator name<input
+              id="setup-name"
+              autocomplete="name"
+              required /></label
+          ><label
+            >Administrator email<input
+              id="setup-email"
+              type="email"
+              autocomplete="email"
+              required /></label
+          ><label
+            >Configured administrator password<input
+              id="setup-password"
+              type="password"
+              autocomplete="current-password"
+              required /></label
+          ><p class="auth-hint">
+            Use the password set in the Home Assistant add-on configuration.
+          </p>
+          <p class="auth-error" id="setup-error" hidden></p>
+          <button class="primary-button" type="submit">
+            Save details and continue <span>→</span>
+          </button>
+        </form>
+      </div>
       </div>
     </div>
     <div class="app-shell">
@@ -73,7 +112,7 @@
           <button class="nav-item active" data-view="overview">
             <span class="nav-icon">◈</span>Overview</button
           ><button class="nav-item" data-view="licenses">
-            <span class="nav-icon">▣</span>Licenses <b>12</b></button
+            <span class="nav-icon">▣</span>Licenses <b>—</b></button
           ><button class="nav-item" data-view="customers">
             <span class="nav-icon">◎</span>Customers</button
           ><button class="nav-item" data-view="activations">
@@ -99,9 +138,9 @@
             </div>
           </div>
           <button class="user-row" id="open-user-profile" type="button">
-            <div class="avatar" id="user-avatar">CR</div>
+            <div class="avatar" id="user-avatar">A</div>
             <div>
-              <strong id="user-display-name">Casey R.</strong
+              <strong id="user-display-name">Administrator</strong
               ><small>Administrator</small>
             </div>
             <span class="more">•••</span>
@@ -139,7 +178,7 @@
           <section class="page-heading">
             <div>
               <p class="eyebrow" id="page-date">MONDAY, SEPTEMBER 14, 2026</p>
-              <h1 id="page-title">Good morning, Casey<span>.</span></h1>
+              <h1 id="page-title">Overview<span>.</span></h1>
               <p class="subheading">
                 Keep an eye on the licenses powering your applications.
               </p>
@@ -154,53 +193,20 @@
                 <span>ACTIVE LICENSES</span
                 ><span class="metric-icon mint">▣</span>
               </div>
-              <strong>1,284</strong>
-              <p>
-                <span class="trend-up">↗ 8.4%</span> <span>vs. last month</span>
-              </p>
-              <div class="sparkline mint-line">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-              </div>
+              <strong>—</strong>
             </article>
             <article class="metric-card">
               <div class="metric-top">
                 <span>TRIALS IN PROGRESS</span
                 ><span class="metric-icon yellow">◷</span>
               </div>
-              <strong>86</strong>
-              <p>
-                <span class="trend-up">↗ 12.1%</span>
-                <span>vs. last month</span>
-              </p>
-              <div class="sparkline yellow-line">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-              </div>
+              <strong>—</strong>
             </article>
             <article class="metric-card">
               <div class="metric-top">
                 <span>RENEWAL RATE</span><span class="metric-icon blue">↻</span>
               </div>
-              <strong>94.6<span class="unit">%</span></strong>
-              <p>
-                <span class="trend-up">↗ 2.6%</span> <span>vs. last month</span>
-              </p>
-              <div class="sparkline blue-line">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-              </div>
-            </article>
-            <article class="metric-card">
-              <div class="metric-top">
-                <span>MONTHLY REVENUE</span
-                ><span class="metric-icon coral">$</span>
-              </div>
-              <strong>$18,420</strong>
-              <p>
-                <span class="trend-up">↗ 14.8%</span>
-                <span>vs. last month</span>
-              </p>
-              <div class="sparkline coral-line">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-              </div>
+              <strong>—</strong>
             </article>
           </section>
           <section class="dashboard-grid" id="overview-grid">
@@ -218,9 +224,9 @@
               </div>
               <div class="table-toolbar">
                 <div class="tabs">
-                  <button class="tab active">All <b>12</b></button
-                  ><button class="tab">Expiring <b>4</b></button
-                  ><button class="tab">Trial <b>8</b></button>
+                  <button class="tab active">All <b>—</b></button
+                  ><button class="tab">Expiring <b>—</b></button
+                  ><button class="tab">Trial <b>—</b></button>
                 </div>
                 <button class="filter-button">Filter <span>≡</span></button>
               </div>
@@ -237,126 +243,7 @@
                     </tr>
                   </thead>
                   <tbody id="license-table">
-                    <tr>
-                      <td>
-                        <div class="customer-cell">
-                          <div class="customer-avatar amber">HM</div>
-                          <div>
-                            <strong>Harbor House</strong
-                            ><small>admin@harborhouse.io</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span class="app-name"
-                          ><i class="app-dot bartender"></i>HA Companion</span
-                        >
-                      </td>
-                      <td><span class="plan pro">PRO</span></td>
-                      <td>
-                        <strong>Sep 18, 2026</strong
-                        ><small class="muted">in 4 days</small>
-                      </td>
-                      <td>
-                        <span class="status-pill warning"><i></i>Expiring</span>
-                      </td>
-                      <td>
-                        <button class="row-menu" aria-label="More actions">
-                          •••
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="customer-cell">
-                          <div class="customer-avatar plum">SH</div>
-                          <div>
-                            <strong>Summit Home</strong
-                            ><small>hello@summithome.co</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span class="app-name"
-                          ><i class="app-dot bartender"></i>HA Companion</span
-                        >
-                      </td>
-                      <td><span class="plan trial">TRIAL</span></td>
-                      <td>
-                        <strong>Sep 22, 2026</strong
-                        ><small class="muted">in 8 days</small>
-                      </td>
-                      <td>
-                        <span class="status-pill trial-status"
-                          ><i></i>Trial</span
-                        >
-                      </td>
-                      <td>
-                        <button class="row-menu" aria-label="More actions">
-                          •••
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="customer-cell">
-                          <div class="customer-avatar blue-avatar">NH</div>
-                          <div>
-                            <strong>Northstar Home</strong
-                            ><small>ops@northstarhome.io</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span class="app-name"
-                          ><i class="app-dot menu"></i>HA Voice</span
-                        >
-                      </td>
-                      <td><span class="plan pro">PRO</span></td>
-                      <td>
-                        <strong>Sep 29, 2026</strong
-                        ><small class="muted">in 15 days</small>
-                      </td>
-                      <td>
-                        <span class="status-pill warning"><i></i>Expiring</span>
-                      </td>
-                      <td>
-                        <button class="row-menu" aria-label="More actions">
-                          •••
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="customer-cell">
-                          <div class="customer-avatar green-avatar">SH</div>
-                          <div>
-                            <strong>Silverleaf Home</strong
-                            ><small>team@silverleafhome.com</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span class="app-name"
-                          ><i class="app-dot bartender"></i>HA Companion</span
-                        >
-                      </td>
-                      <td><span class="plan base">BASE</span></td>
-                      <td>
-                        <strong>Oct 04, 2026</strong
-                        ><small class="muted">in 20 days</small>
-                      </td>
-                      <td>
-                        <span class="status-pill active-status"
-                          ><i></i>Active</span
-                        >
-                      </td>
-                      <td>
-                        <button class="row-menu" aria-label="More actions">
-                          •••
-                        </button>
-                      </td>
-                    </tr>
+                    <tr><td colspan="6" class="empty-table-state">Loading license data...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -366,27 +253,13 @@
                 <div class="panel-heading">
                   <div>
                     <h2>App profiles</h2>
-                    <p>2 active products</p>
+                    <p>Loading profiles...</p>
                   </div>
                   <button class="round-button" aria-label="Add app profile">
                     ＋
                   </button>
                 </div>
-                <div class="profile-item selected">
-                  <div class="profile-logo bartender-logo">HA</div>
-                  <div class="profile-info">
-                    <strong>HA Companion</strong
-                    ><small>1,047 active licenses</small>
-                  </div>
-                  <span class="profile-arrow">→</span>
-                </div>
-                <div class="profile-item">
-                  <div class="profile-logo menu-logo">HV</div>
-                  <div class="profile-info">
-                    <strong>HA Voice</strong><small>237 active licenses</small>
-                  </div>
-                  <span class="profile-arrow">→</span>
-                </div>
+                <div class="profile-empty">Loading profiles...</div>
                 <button class="manage-button" data-view="profiles">
                   Manage profiles <span>→</span>
                 </button>
@@ -402,40 +275,14 @@
                   </button>
                 </div>
                 <div class="activity-list">
-                  <div class="activity-item">
-                    <div class="activity-icon mint-bg">✓</div>
-                    <div>
-                      <strong>License issued</strong>
-                      <p>HA Companion Pro for <b>Maple Street Home</b></p>
-                      <small>12 minutes ago</small>
-                    </div>
-                  </div>
-                  <div class="activity-item">
-                    <div class="activity-icon blue-bg">↻</div>
-                    <div>
-                      <strong>Activation renewed</strong>
-                      <p><b>Silverleaf Home</b> · installation 02</p>
-                      <small>46 minutes ago</small>
-                    </div>
-                  </div>
-                  <div class="activity-item">
-                    <div class="activity-icon coral-bg">×</div>
-                    <div>
-                      <strong>License revoked</strong>
-                      <p>HA Voice Base for <b>Juniper Home</b></p>
-                      <small>2 hours ago</small>
-                    </div>
-                  </div>
+                  <div class="activity-empty">Loading activity...</div>
                 </div>
               </div>
             </aside>
           </section>
           <section class="view-panel" id="view-panel" hidden></section>
           <footer class="page-footer">
-            <span>Keystone Licensing Portal <b>·</b> v0.9.4</span
-            ><span
-              >Last synced <strong>just now</strong> <i class="status-dot"></i
-            ></span>
+            <span>Keystone Licensing Portal <b>·</b> v0.9.4</span>
           </footer>
         </div>
       </main>
@@ -462,9 +309,8 @@
         </div>
         <form id="license-form">
           <label
-            >Application profile<select id="application">
-              <option value="home-assistant-companion">HA Companion</option>
-              <option value="home-assistant-voice">HA Voice</option>
+            >Application profile<select id="application" disabled>
+              <option value="">Loading profiles...</option>
             </select></label
           >
           <div class="form-grid">
@@ -472,20 +318,19 @@
               >Customer name<input
                 id="customer"
                 required
-                placeholder="e.g. Maple Street Home" /></label
+                placeholder="Enter customer name" /></label
             ><label
               >Customer email<input
                 id="email"
                 type="email"
                 required
-                placeholder="owner@example.com"
+                placeholder="Enter customer email"
             /></label>
           </div>
           <div class="form-grid">
             <label
-              >License plan<select id="plan">
-                <option value="pro">Pro</option>
-                <option value="base">Base</option>
+              >License plan<select id="plan" disabled>
+                <option value="">Loading license options...</option>
               </select></label
             ><label
               >License type<select id="license-type">
@@ -549,13 +394,13 @@
             >Customer name<input
               id="customer-name"
               required
-              placeholder="e.g. Maple Street Home" /></label
+              placeholder="Enter customer name" /></label
           ><label
             >Customer email<input
               id="customer-email"
               type="email"
               required
-              placeholder="owner@example.com"
+              placeholder="Enter customer email"
           /></label>
           <p class="form-error" id="customer-form-error" hidden></p>
           <div class="modal-footer">
@@ -600,12 +445,12 @@
                 id="profile-app-id"
                 required
                 pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                placeholder="e.g. home-assistant-dashboard" /></label
+                placeholder="Enter profile ID" /></label
             ><label
               >Display name<input
                 id="profile-name"
                 required
-                placeholder="e.g. HA Dashboard"
+                placeholder="Enter application name"
             /></label>
           </div>
           <div class="form-grid">
@@ -628,7 +473,7 @@
           <label
             >Feature entitlements<input
               id="profile-features"
-              placeholder="remote_access, advanced_automations"
+              placeholder="Comma-separated feature identifiers"
           /></label>
           <p class="form-error" id="profile-form-error" hidden></p>
           <div class="modal-footer">
@@ -671,13 +516,13 @@
             >Display name<input
               id="user-profile-name"
               required
-              placeholder="e.g. Casey R." /></label
+              placeholder="Enter display name" /></label
           ><label
             >Email<input
               id="user-profile-email"
               type="email"
               required
-              placeholder="admin@example.com"
+              placeholder="Enter email address"
           /></label>
           <p class="form-error" id="user-profile-error" hidden></p>
           <div class="modal-footer">
