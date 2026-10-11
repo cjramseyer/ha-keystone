@@ -98,8 +98,9 @@ function ensureRuntimeFiles() {
       JSON.stringify(
         {
           username: "admin",
-          name: "Casey R.",
-          email: "admin@example.com",
+          name: "",
+          email: "",
+          setup_complete: false,
           password_hash: hashPassword(password),
         },
         null,
@@ -126,12 +127,21 @@ function ensureRuntimeFiles() {
       auth.username = "admin";
       changed = true;
     }
-    if (!auth.name) {
-      auth.name = "Casey R.";
+    if (typeof auth.name !== "string") {
+      auth.name = "";
       changed = true;
     }
-    if (!auth.email) {
-      auth.email = "admin@example.com";
+    if (typeof auth.email !== "string") {
+      auth.email = "";
+      changed = true;
+    }
+    if (typeof auth.setup_complete !== "boolean") {
+      auth.setup_complete = Boolean(
+        auth.name.trim() &&
+        auth.email.trim() &&
+        auth.name !== "Casey R." &&
+        auth.email !== "admin@example.com",
+      );
       changed = true;
     }
     if (changed)
@@ -478,6 +488,12 @@ async function handleApi(request, response) {
   if (request.method === "POST" && pathname === "/api/auth/login") {
     const body = await readBody(request);
     const storedAuth = JSON.parse(fs.readFileSync(authFile, "utf8"));
+    if (!storedAuth.setup_complete)
+      return sendError(
+        response,
+        409,
+        "Complete first-time setup before signing in",
+      );
     if (
       body.email !== "admin" ||
       typeof body.password !== "string" ||
@@ -489,6 +505,62 @@ async function handleApi(request, response) {
       response,
       200,
       { authenticated: true },
+      {
+        "Set-Cookie": `${sessionCookie}=${encodeURIComponent(session)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`,
+      },
+    );
+  }
+  if (request.method === "POST" && pathname === "/api/auth/setup") {
+    const body = await readBody(request);
+    const name = String(body.name || "").trim();
+    const email = String(body.email || "")
+      .trim()
+      .toLowerCase();
+    const password = body.password;
+    if (
+      !name ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      typeof password !== "string"
+    )
+      return sendError(
+        response,
+        400,
+        "A name, valid email, and administrator password are required",
+      );
+    const auth = JSON.parse(fs.readFileSync(authFile, "utf8"));
+    if (auth.setup_complete)
+      return sendError(response, 409, "Initial setup is already complete");
+    if (!verifyPassword(password, auth.password_hash))
+      return sendError(
+        response,
+        401,
+        "The configured administrator password is incorrect",
+      );
+    auth.name = name;
+    auth.email = email;
+    auth.setup_complete = true;
+    fs.writeFileSync(authFile, JSON.stringify(auth, null, 2), { mode: 0o600 });
+    const data = readData();
+    data.audit_events ||= [];
+    data.audit_events.push({
+      id: id("audit"),
+      actor: auth.username || "admin",
+      action: "admin.setup.completed",
+      created_at: new Date().toISOString(),
+    });
+    writeData(data);
+    const session = createSession();
+    return sendJson(
+      response,
+      200,
+      {
+        authenticated: true,
+        profile: {
+          username: auth.username,
+          name: auth.name,
+          email: auth.email,
+        },
+      },
       {
         "Set-Cookie": `${sessionCookie}=${encodeURIComponent(session)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`,
       },
@@ -511,6 +583,7 @@ async function handleApi(request, response) {
     const auth = JSON.parse(fs.readFileSync(authFile, "utf8"));
     return sendJson(response, 200, {
       authenticated,
+      setup_required: !auth.setup_complete,
       profile: authenticated
         ? { username: auth.username, name: auth.name, email: auth.email }
         : null,
