@@ -107,7 +107,8 @@ function updateApplicationOptions() {
   const applicationSelect = document.getElementById("application");
   if (!applicationSelect) return;
   if (!appProfiles.length) {
-    applicationSelect.innerHTML = '<option value="">No profiles available</option>';
+    applicationSelect.innerHTML =
+      '<option value="">No profiles available</option>';
     applicationSelect.disabled = true;
     updateLicenseOptions("");
     return;
@@ -398,7 +399,9 @@ async function showView(view) {
   if (view === "keys") {
     try {
       const issuer = await api("/api/issuer/public-key");
-      rows = [[issuer.key_id, issuer.algorithm, "Active", "Current", "Protected"]];
+      rows = [
+        [issuer.key_id, issuer.algorithm, "Active", "Current", "Protected"],
+      ];
     } catch {
       rows = [];
     }
@@ -451,32 +454,32 @@ async function showView(view) {
             .join("")
         : '<div class="view-row"><span>No audit events recorded.</span></div>'
       : view === "profiles"
-      ? rows
-          .map(
-            (row, index) =>
-              `<div class="view-row profile-view-row"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[4])}</span><button class="edit-profile" data-profile-edit="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Edit</button><button class="delete-profile" data-profile-delete="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Delete</button></div>`,
-          )
-          .join("")
-      : view === "customers"
         ? rows
             .map(
               (row, index) =>
-                `<div class="view-row customer-view-row" data-customer-focus="${escapeHtml(customerRecords[index]?.id || "")}" tabindex="0"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[3])}</span>${row[4] === "Eligible" ? `<button class="delete-customer" data-customer-delete="${escapeHtml(customerRecords[index]?.id || "")}" type="button">Delete</button>` : '<span class="row-protected">Protected</span>'}</div>`,
+                `<div class="view-row profile-view-row"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[4])}</span><button class="edit-profile" data-profile-edit="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Edit</button><button class="delete-profile" data-profile-delete="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Delete</button></div>`,
             )
             .join("")
-        : view === "licenses"
+        : view === "customers"
           ? rows
               .map(
                 (row, index) =>
-                  `<div class="view-row license-view-row ${focusedLicenseId === licenseRecords[index]?.license_id ? "focused-license-row" : ""}" data-license-row="${escapeHtml(licenseRecords[index]?.license_id || "")}"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state ${row[4] === "revoked" ? "revoked-state" : ""}">${escapeHtml(row[4])}</span>${row[4] === "revoked" ? '<span class="row-protected">Historical</span>' : `<button class="deliver-license" data-license-deliver="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Deliver</button><button class="revoke-license" data-license-revoke="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Revoke</button>`}</div>`,
+                  `<div class="view-row customer-view-row" data-customer-focus="${escapeHtml(customerRecords[index]?.id || "")}" tabindex="0"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[3])}</span>${row[4] === "Eligible" ? `<button class="delete-customer" data-customer-delete="${escapeHtml(customerRecords[index]?.id || "")}" type="button">Delete</button>` : '<span class="row-protected">Protected</span>'}</div>`,
               )
               .join("")
-          : rows
-              .map(
-                (row) =>
-                  `<div class="view-row">${row.map((cell, index) => `<span class="${index === row.length - 1 ? "row-state" : ""}">${escapeHtml(cell)}</span>`).join("")}</div>`,
-              )
-              .join("");
+          : view === "licenses"
+            ? rows
+                .map(
+                  (row, index) =>
+                    `<div class="view-row license-view-row ${focusedLicenseId === licenseRecords[index]?.license_id ? "focused-license-row" : ""}" data-license-row="${escapeHtml(licenseRecords[index]?.license_id || "")}"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state ${row[4] === "revoked" ? "revoked-state" : ""}">${escapeHtml(row[4])}</span>${row[4] === "revoked" ? '<span class="row-protected">Historical</span>' : `<button class="deliver-license" data-license-deliver="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Deliver</button><button class="revoke-license" data-license-revoke="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Revoke</button>`}</div>`,
+                )
+                .join("")
+            : rows
+                .map(
+                  (row) =>
+                    `<div class="view-row">${row.map((cell, index) => `<span class="${index === row.length - 1 ? "row-state" : ""}">${escapeHtml(cell)}</span>`).join("")}</div>`,
+                )
+                .join("");
   if (view !== "audit" && !rows.length) {
     const emptyMessages = {
       licenses: "No licenses recorded.",

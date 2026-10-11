@@ -138,9 +138,9 @@ function ensureRuntimeFiles() {
     if (typeof auth.setup_complete !== "boolean") {
       auth.setup_complete = Boolean(
         auth.name.trim() &&
-          auth.email.trim() &&
-          auth.name !== "Casey R." &&
-          auth.email !== "admin@example.com",
+        auth.email.trim() &&
+        auth.name !== "Casey R." &&
+        auth.email !== "admin@example.com",
       );
       changed = true;
     }
@@ -489,7 +489,11 @@ async function handleApi(request, response) {
     const body = await readBody(request);
     const storedAuth = JSON.parse(fs.readFileSync(authFile, "utf8"));
     if (!storedAuth.setup_complete)
-      return sendError(response, 409, "Complete first-time setup before signing in");
+      return sendError(
+        response,
+        409,
+        "Complete first-time setup before signing in",
+      );
     if (
       body.email !== "admin" ||
       typeof body.password !== "string" ||
@@ -518,12 +522,20 @@ async function handleApi(request, response) {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       typeof password !== "string"
     )
-      return sendError(response, 400, "A name, valid email, and administrator password are required");
+      return sendError(
+        response,
+        400,
+        "A name, valid email, and administrator password are required",
+      );
     const auth = JSON.parse(fs.readFileSync(authFile, "utf8"));
     if (auth.setup_complete)
       return sendError(response, 409, "Initial setup is already complete");
     if (!verifyPassword(password, auth.password_hash))
-      return sendError(response, 401, "The configured administrator password is incorrect");
+      return sendError(
+        response,
+        401,
+        "The configured administrator password is incorrect",
+      );
     auth.name = name;
     auth.email = email;
     auth.setup_complete = true;
@@ -543,7 +555,11 @@ async function handleApi(request, response) {
       200,
       {
         authenticated: true,
-        profile: { username: auth.username, name: auth.name, email: auth.email },
+        profile: {
+          username: auth.username,
+          name: auth.name,
+          email: auth.email,
+        },
       },
       {
         "Set-Cookie": `${sessionCookie}=${encodeURIComponent(session)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`,
