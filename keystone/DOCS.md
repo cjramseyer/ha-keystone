@@ -38,6 +38,8 @@ schema:
 
 The startup script maps that option to `PORTAL_ADMIN_PASSWORD`. On every start, the server creates the administrator record if needed or updates its password hash when the configured password differs. This supports password resets entirely through the Home Assistant Configuration tab.
 
+On first use, the portal asks for the administrator's name and email and verifies the configured password. Completing setup stores the profile and starts an authenticated session; it does not replace the configured password.
+
 ## Build and runtime
 
 Home Assistant builds an architecture-specific image using `build.yaml`:

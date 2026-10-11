@@ -57,10 +57,9 @@ let customerRecords = [];
 let focusedLicenseId = null;
 let notificationsPanel = null;
 let focusedCustomerId = null;
+let currentUserName = "";
+let currentView = "overview";
 
-document.querySelectorAll(".metric-card").forEach((card) => {
-  if (card.textContent.includes("MONTHLY REVENUE")) card.remove();
-});
 const dashboardProfileLink = document.querySelector(
   ".profile-panel .manage-button",
 );
@@ -89,23 +88,15 @@ function updateLicenseOptions(appId) {
   const optionSelect = document.getElementById("plan");
   if (!optionSelect) return;
   const profile = appProfiles.find((candidate) => candidate.app_id === appId);
-  const options = profile
-    ? profile.license_options || []
-    : [
-        {
-          id: "trial-30",
-          type: "trial",
-          label: "30-day trial",
-          length_days: 30,
-        },
-        { id: "pro-365", type: "pro", label: "Pro · 1 year", length_days: 365 },
-      ];
-  optionSelect.innerHTML = options
-    .map(
-      (option) =>
-        `<option value="${escapeHtml(option.id)}">${escapeHtml(option.label || `${option.type} · ${option.length_days} days`)}</option>`,
-    )
-    .join("");
+  const options = profile?.license_options || [];
+  optionSelect.innerHTML = options.length
+    ? options
+        .map(
+          (option) =>
+            `<option value="${escapeHtml(option.id)}">${escapeHtml(option.label || `${option.type} · ${option.length_days} days`)}</option>`,
+        )
+        .join("")
+    : '<option value="">No license options available</option>';
   optionSelect.disabled = options.length === 0;
   optionSelect.closest("label").firstChild.textContent = "License option";
   const typeLabel = document.getElementById("license-type")?.closest("label");
@@ -114,7 +105,15 @@ function updateLicenseOptions(appId) {
 
 function updateApplicationOptions() {
   const applicationSelect = document.getElementById("application");
-  if (!applicationSelect || !appProfiles.length) return;
+  if (!applicationSelect) return;
+  if (!appProfiles.length) {
+    applicationSelect.innerHTML =
+      '<option value="">No profiles available</option>';
+    applicationSelect.disabled = true;
+    updateLicenseOptions("");
+    return;
+  }
+  applicationSelect.disabled = false;
   const currentAppId = applicationSelect.value;
   applicationSelect.innerHTML = appProfiles
     .map(
@@ -200,133 +199,38 @@ const viewCopy = {
     title: "Licenses",
     description:
       "Search, renew, revoke, and inspect every Home Assistant app license.",
-    rows: [
-      ["Harbor House", "HA Companion", "Pro", "Sep 18, 2026", "Expiring"],
-      ["Summit Home", "HA Companion", "Trial", "Sep 22, 2026", "Trial"],
-      ["Northstar Home", "HA Voice", "Pro", "Sep 29, 2026", "Expiring"],
-      ["Silverleaf Home", "HA Companion", "Base", "Oct 04, 2026", "Active"],
-    ],
+    rows: [],
   },
   customers: {
     eyebrow: "CUSTOMER DIRECTORY",
     title: "Customers",
     description: "Customer records connected to Home Assistant installations.",
-    rows: [
-      [
-        "Harbor House",
-        "admin@harborhouse.io",
-        "2 installations",
-        "3 licenses",
-        "Active",
-      ],
-      [
-        "Summit Home",
-        "hello@summithome.co",
-        "1 installation",
-        "1 trial",
-        "Trial",
-      ],
-      [
-        "Northstar Home",
-        "ops@northstarhome.io",
-        "4 installations",
-        "2 licenses",
-        "Active",
-      ],
-    ],
+    rows: [],
   },
   activations: {
     eyebrow: "INSTALLATION CONTROL",
     title: "Activations",
     description: "Review instance identity, leases, and installation limits.",
-    rows: [
-      [
-        "Harbor House",
-        "HA Companion",
-        "installation-01",
-        "1 / 2 used",
-        "Healthy",
-      ],
-      [
-        "Northstar Home",
-        "HA Voice",
-        "installation-04",
-        "2 / 3 used",
-        "Renew soon",
-      ],
-      [
-        "Silverleaf Home",
-        "HA Companion",
-        "installation-02",
-        "1 / 2 used",
-        "Healthy",
-      ],
-    ],
+    rows: [],
   },
   profiles: {
     eyebrow: "APPLICATION CONFIGURATION",
     title: "App profiles",
     description:
       "Plans, entitlements, audiences, and activation rules for each app.",
-    rows: [
-      [
-        "HA Companion",
-        "home-assistant-companion",
-        "30 day trial",
-        "2 installs",
-        "Active",
-      ],
-      [
-        "HA Voice",
-        "home-assistant-voice",
-        "30 day trial",
-        "3 installs",
-        "Active",
-      ],
-    ],
+    rows: [],
   },
   keys: {
     eyebrow: "SIGNING SECURITY",
     title: "Signing keys",
     description: "Ed25519 issuer keys and rotation readiness.",
-    rows: [
-      ["issuer-ed25519-01", "Ed25519", "Active", "Current", "Protected"],
-      [
-        "issuer-ed25519-00",
-        "Ed25519",
-        "Previous",
-        "Rotation complete",
-        "Protected",
-      ],
-    ],
+    rows: [],
   },
   audit: {
     eyebrow: "SECURITY HISTORY",
     title: "Audit log",
     description: "Administrative events recorded by the licensing issuer.",
-    rows: [
-      [
-        "License issued",
-        "HA Companion Pro",
-        "Maple Street Home",
-        "12 minutes ago",
-        "Admin",
-      ],
-      [
-        "Activation renewed",
-        "HA Companion",
-        "Silverleaf Home",
-        "46 minutes ago",
-        "System",
-      ],
-      [
-        "License revoked",
-        "HA Voice Base",
-        "Juniper Home",
-        "2 hours ago",
-        "Admin",
-      ],
-    ],
+    rows: [],
   },
   settings: {
     eyebrow: "WORKSPACE PREFERENCES",
@@ -414,6 +318,7 @@ async function showView(view) {
   let profileRecords = [];
   let customerRecords = [];
   let licenseRecords = [];
+  let auditRecords = [];
   if (view === "profiles") {
     try {
       const state = await api("/api/state");
@@ -431,7 +336,8 @@ async function showView(view) {
         "Active",
       ]);
     } catch {
-      profileRecords = rows.map((row) => ({ app_id: row[1], name: row[0] }));
+      profileRecords = [];
+      rows = [];
     }
   }
   if (view === "customers") {
@@ -453,6 +359,7 @@ async function showView(view) {
       });
     } catch {
       customerRecords = [];
+      rows = [];
     }
   }
   if (view === "licenses") {
@@ -486,43 +393,114 @@ async function showView(view) {
       ]);
     } catch {
       licenseRecords = [];
+      rows = [];
     }
   }
-  const rowsMarkup =
-    view === "profiles"
-      ? rows
-          .map(
-            (row, index) =>
-              `<div class="view-row profile-view-row"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[4])}</span><button class="edit-profile" data-profile-edit="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Edit</button><button class="delete-profile" data-profile-delete="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Delete</button></div>`,
-          )
-          .join("")
-      : view === "customers"
+  if (view === "keys") {
+    try {
+      const issuer = await api("/api/issuer/public-key");
+      rows = [
+        [issuer.key_id, issuer.algorithm, "Active", "Current", "Protected"],
+      ];
+    } catch {
+      rows = [];
+    }
+  }
+  if (view === "audit") {
+    try {
+      const state = await api("/api/state");
+      auditRecords = state.audit_events || [];
+      const customersById = Object.fromEntries(
+        (state.customers || []).map((customer) => [customer.id, customer.name]),
+      );
+      const licensesById = Object.fromEntries(
+        (state.licenses || []).map((license) => [license.license_id, license]),
+      );
+      const profilesById = Object.fromEntries(
+        (state.profiles || []).map((profile) => [profile.app_id, profile.name]),
+      );
+      rows = auditRecords.map((auditEvent) => {
+        const license = licensesById[auditEvent.license_id];
+        const customerName =
+          customersById[auditEvent.customer_id || license?.customer_id];
+        const resource = license
+          ? `${license.license_id}${customerName ? ` · ${customerName}` : ""}`
+          : customerName ||
+            profilesById[auditEvent.app_id] ||
+            auditEvent.app_id ||
+            auditEvent.app_profile_id ||
+            auditEvent.license_id ||
+            "Workspace";
+        return [
+          notificationText(auditEvent),
+          auditEvent.actor || "system",
+          resource,
+          new Date(auditEvent.created_at).toLocaleString("en-US"),
+        ];
+      });
+    } catch {
+      auditRecords = [];
+      rows = [];
+    }
+  }
+  let rowsMarkup =
+    view === "audit"
+      ? rows.length
+        ? rows
+            .map(
+              (row) =>
+                `<div class="view-row">${row.map((cell) => `<span>${escapeHtml(cell)}</span>`).join("")}</div>`,
+            )
+            .join("")
+        : '<div class="view-row"><span>No audit events recorded.</span></div>'
+      : view === "profiles"
         ? rows
             .map(
               (row, index) =>
-                `<div class="view-row customer-view-row" data-customer-focus="${escapeHtml(customerRecords[index]?.id || "")}" tabindex="0"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[3])}</span>${row[4] === "Eligible" ? `<button class="delete-customer" data-customer-delete="${escapeHtml(customerRecords[index]?.id || "")}" type="button">Delete</button>` : '<span class="row-protected">Protected</span>'}</div>`,
+                `<div class="view-row profile-view-row"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[4])}</span><button class="edit-profile" data-profile-edit="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Edit</button><button class="delete-profile" data-profile-delete="${escapeHtml(profileRecords[index]?.app_id || row[1])}" type="button">Delete</button></div>`,
             )
             .join("")
-        : view === "licenses"
+        : view === "customers"
           ? rows
               .map(
                 (row, index) =>
-                  `<div class="view-row license-view-row ${focusedLicenseId === licenseRecords[index]?.license_id ? "focused-license-row" : ""}" data-license-row="${escapeHtml(licenseRecords[index]?.license_id || "")}"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state ${row[4] === "revoked" ? "revoked-state" : ""}">${escapeHtml(row[4])}</span>${row[4] === "revoked" ? '<span class="row-protected">Historical</span>' : `<button class="deliver-license" data-license-deliver="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Deliver</button><button class="revoke-license" data-license-revoke="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Revoke</button>`}</div>`,
+                  `<div class="view-row customer-view-row" data-customer-focus="${escapeHtml(customerRecords[index]?.id || "")}" tabindex="0"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state">${escapeHtml(row[3])}</span>${row[4] === "Eligible" ? `<button class="delete-customer" data-customer-delete="${escapeHtml(customerRecords[index]?.id || "")}" type="button">Delete</button>` : '<span class="row-protected">Protected</span>'}</div>`,
               )
               .join("")
-          : rows
-              .map(
-                (row) =>
-                  `<div class="view-row">${row.map((cell, index) => `<span class="${index === row.length - 1 ? "row-state" : ""}">${escapeHtml(cell)}</span>`).join("")}</div>`,
-              )
-              .join("");
+          : view === "licenses"
+            ? rows
+                .map(
+                  (row, index) =>
+                    `<div class="view-row license-view-row ${focusedLicenseId === licenseRecords[index]?.license_id ? "focused-license-row" : ""}" data-license-row="${escapeHtml(licenseRecords[index]?.license_id || "")}"><span>${escapeHtml(row[0])}</span><span>${escapeHtml(row[1])}</span><span>${escapeHtml(row[2])}</span><span class="row-state ${row[4] === "revoked" ? "revoked-state" : ""}">${escapeHtml(row[4])}</span>${row[4] === "revoked" ? '<span class="row-protected">Historical</span>' : `<button class="deliver-license" data-license-deliver="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Deliver</button><button class="revoke-license" data-license-revoke="${escapeHtml(licenseRecords[index]?.license_id || "")}" type="button">Revoke</button>`}</div>`,
+                )
+                .join("")
+            : rows
+                .map(
+                  (row) =>
+                    `<div class="view-row">${row.map((cell, index) => `<span class="${index === row.length - 1 ? "row-state" : ""}">${escapeHtml(cell)}</span>`).join("")}</div>`,
+                )
+                .join("");
+  if (view !== "audit" && !rows.length) {
+    const emptyMessages = {
+      licenses: "No licenses recorded.",
+      customers: "No customers recorded.",
+      activations: "No activation records available.",
+      profiles: "No application profiles configured.",
+      keys: "Signing key details are unavailable.",
+    };
+    rowsMarkup = `<div class="view-row"><span>${emptyMessages[view] || "No records available."}</span></div>`;
+  }
   const actionMarkup =
     view === "profiles"
       ? '<button class="primary-button" id="view-action"><span>＋</span> Add profile</button>'
       : view === "customers"
         ? '<button class="primary-button" id="view-action"><span>＋</span> Add customer</button>'
         : "";
-  viewPanel.innerHTML = `<div class="panel view-card"><div class="panel-heading"><div><p class="eyebrow">${selectedView.eyebrow}</p><h2>${selectedView.title}</h2><p>${selectedView.description}</p></div>${actionMarkup}</div><div class="view-table"><div class="view-row view-header"><span>${view === "licenses" || view === "customers" || view === "activations" ? "Customer" : "Resource"}</span><span>${view === "licenses" ? "Application" : "Details"}</span><span>${view === "licenses" ? "Plan" : "Reference"}</span><span>${view === "licenses" ? "Expires" : "Status"}</span><span></span></div>${rowsMarkup}</div></div>`;
+  const headerMarkup =
+    view === "audit"
+      ? "<span>Event</span><span>Actor</span><span>Resource</span><span>Recorded at</span>"
+      : `<span>${view === "licenses" || view === "customers" || view === "activations" ? "Customer" : "Resource"}</span><span>${view === "licenses" ? "Application" : "Details"}</span><span>${view === "licenses" ? "Plan" : "Reference"}</span><span>${view === "licenses" ? "Expires" : "Status"}</span><span></span>`;
+  viewPanel.innerHTML = `<div class="panel view-card"><div class="panel-heading"><div><p class="eyebrow">${selectedView.eyebrow}</p><h2>${selectedView.title}</h2><p>${selectedView.description}</p></div>${actionMarkup}</div><div class="view-table${view === "audit" ? " audit-table" : ""}"><div class="view-row view-header">${headerMarkup}</div>${rowsMarkup}</div></div>`;
   if (view === "licenses") focusedLicenseId = null;
 }
 
@@ -540,23 +518,41 @@ async function api(path, options = {}) {
 
 async function establishSession() {
   const session = await api("/api/auth/session");
-  authGate.hidden = session.authenticated;
+  const setupRequired = Boolean(session.setup_required);
+  document.getElementById("login-card").hidden = setupRequired;
+  document.getElementById("setup-card").hidden = !setupRequired;
+  authGate.hidden = session.authenticated && !setupRequired;
   if (session.profile) updateUserProfile(session.profile);
-  if (session.authenticated) await loadDashboardMetrics();
+  if (session.authenticated && !setupRequired) await loadDashboardMetrics();
 }
 
 function updateUserProfile(profile) {
-  document.getElementById("user-display-name").textContent = profile.name;
-  document.getElementById("user-avatar").textContent = profile.name
+  currentUserName = typeof profile.name === "string" ? profile.name.trim() : "";
+  const displayName = currentUserName || "Administrator";
+  document.getElementById("user-display-name").textContent = displayName;
+  document.getElementById("user-avatar").textContent = displayName
     .split(/\s+/)
     .map((part) => part[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
-  document.getElementById("user-profile-name").value = profile.name;
+  document.getElementById("user-profile-name").value = currentUserName;
   document.getElementById("user-profile-email").value = profile.email;
-  if (document.getElementById("breadcrumb-current").textContent === "Overview")
-    pageTitle.innerHTML = `${getTimeOfDayGreeting()}, ${escapeHtml(profile.name)}<span>.</span>`;
+  renderPageTitle(currentView);
+}
+
+function renderPageTitle(view) {
+  if (view === "overview") {
+    pageTitle.innerHTML = currentUserName
+      ? `${getTimeOfDayGreeting()}, ${escapeHtml(currentUserName)}<span>.</span>`
+      : "Overview<span>.</span>";
+    return;
+  }
+  const label =
+    view === "settings"
+      ? "Configuration"
+      : view.charAt(0).toUpperCase() + view.slice(1);
+  pageTitle.innerHTML = `${label}<span>.</span>`;
 }
 
 async function loadDashboardMetrics() {
@@ -593,6 +589,7 @@ function updateDashboardProfiles(profiles) {
   if (heading)
     heading.textContent = `${profiles.length} active product${profiles.length === 1 ? "" : "s"}`;
   panel.querySelectorAll(".profile-item").forEach((item) => item.remove());
+  panel.querySelector(".profile-empty")?.remove();
   const manageButton = panel.querySelector(".manage-button");
   profiles
     .slice(0, 4)
@@ -603,6 +600,12 @@ function updateDashboardProfiles(profiles) {
       item.innerHTML = `<div class="profile-logo bartender-logo">${escapeHtml(profile.name.slice(0, 2).toUpperCase())}</div><div class="profile-info"><strong>${escapeHtml(profile.name)}</strong><small>${(profile.license_options || []).length} license option${(profile.license_options || []).length === 1 ? "" : "s"}</small></div><span class="profile-arrow">→</span>`;
       panel.insertBefore(item, manageButton);
     });
+  if (!profiles.length) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "profile-empty";
+    emptyState.textContent = "No application profiles configured.";
+    panel.insertBefore(emptyState, manageButton);
+  }
 }
 
 function updateRecentActivity(state) {
@@ -861,6 +864,31 @@ document
     }
   });
 
+document
+  .getElementById("setup-form")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const setupError = document.getElementById("setup-error");
+    setupError.hidden = true;
+    try {
+      const result = await api("/api/auth/setup", {
+        method: "POST",
+        body: JSON.stringify({
+          name: document.getElementById("setup-name").value,
+          email: document.getElementById("setup-email").value,
+          password: document.getElementById("setup-password").value,
+        }),
+      });
+      document.getElementById("setup-password").value = "";
+      authGate.hidden = true;
+      updateUserProfile(result.profile);
+      await loadDashboardMetrics();
+    } catch (error) {
+      setupError.textContent = error.message;
+      setupError.hidden = false;
+    }
+  });
+
 async function openModal() {
   modal.hidden = false;
   await loadAppProfiles();
@@ -924,6 +952,7 @@ document
 document.querySelectorAll("[data-view]").forEach((button) => {
   button.addEventListener("click", () => {
     const view = button.dataset.view;
+    currentView = view;
     const label =
       view === "settings"
         ? "Configuration"
@@ -934,8 +963,7 @@ document.querySelectorAll("[data-view]").forEach((button) => {
         item.classList.toggle("active", item.dataset.view === view),
       );
     breadcrumb.textContent = label;
-    if (view !== "overview") pageTitle.innerHTML = `${label}<span>.</span>`;
-    else pageTitle.innerHTML = `${getTimeOfDayGreeting()}, Casey<span>.</span>`;
+    renderPageTitle(view);
     showView(view);
   });
 });

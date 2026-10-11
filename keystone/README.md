@@ -10,7 +10,7 @@ This directory is the Home Assistant add-on package. The full product documentat
 2. Open **Keystone Licensing Portal**.
 3. Set `portal_admin_password` in the add-on Configuration tab.
 4. Install and start the add-on.
-5. Open the add-on through Home Assistant ingress.
+5. Open the add-on through Home Assistant ingress and complete first-time administrator setup.
 
 The add-on listens on internal port `3000`, binds to `0.0.0.0`, and enables ingress. Ingress is the recommended access path. Direct port access is optional and should remain restricted to a trusted network.
 
@@ -23,6 +23,8 @@ The add-on listens on internal port `3000`, binds to `0.0.0.0`, and enables ingr
 The default password is `change-me-local` only when the add-on starts without a configured password and has no existing `/data/auth.json`. Set a real password before the first start.
 
 To set or reset the login, enter the desired `portal_admin_password` in the add-on Configuration tab, save, and restart the add-on. Keystone replaces the stored password hash during startup, so no SSH access or file deletion is required. Sign in with the username `admin` and the configured password.
+
+On first use, Keystone asks for the administrator's name and email, then verifies the configured password before creating a session. The wizard does not replace the password configured in Home Assistant.
 
 ## Persistent storage
 
